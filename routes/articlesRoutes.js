@@ -1,6 +1,6 @@
 import express from "express"
 import Article from "../models/ArticleModel.js";
-import { getArticles, addArticle, deleteArticle, updateArticle } from "../controllers/ArticlesController.js";
+import { getArticles, addArticle, deleteArticle, updateArticle } from "../controllers/articlesController.js";
 
 const router = express.Router()
 
