@@ -78,4 +78,40 @@ const updateArticle = async (req, res) => {
 
 }
 
-export { getArticles ,addArticle, deleteArticle, updateArticle }  
+/***********************************Search a specific article*************************************** */
+const fulltextSearchArticles = async (req, res) => {
+    try {
+        const pipeline = []
+        pipeline.push({
+            $search: {
+                index: "searchArticles",
+                text: {
+                    query: req.query.text,
+                    path: {
+                        wildcard: "*"
+                    },
+                    fuzzy: {}
+                },
+            },
+        })
+
+        pipeline.push({
+            $project: {
+                _id: 0,
+                article_title: 1,
+                author: 1,
+                article_summary: 1,
+                thumbnail_image: 1,
+                creation_date: 1,
+                score: { $meta: "searchScore" },
+            }
+        })
+
+        const result = await Article.aggregate(pipeline).sort({ creation_date: req.query.sort === "desc" ? -1 : 1});
+        res.status(200).json({ result });
+    } catch(error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+export { getArticles ,addArticle, deleteArticle, updateArticle, fulltextSearchArticles }  
