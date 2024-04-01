@@ -1,6 +1,6 @@
 import express from "express"
 import Article from "../models/ArticleModel.js";
-import { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchArticles } from "../controllers/articlesController.js";
+import { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchArticles, autocompleteArticleSearch } from "../controllers/articlesController.js";
 
 const router = express.Router()
 
@@ -18,5 +18,8 @@ router.put("/:id", updateArticle);
 
 // Search for articles
 router.get("/search", fulltextSearchArticles);
+
+// Autocomplete search
+router.get("/autocomplete", autocompleteArticleSearch);
 
 export { router as articlesRoutes }
