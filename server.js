@@ -1,5 +1,6 @@
 import express from "express"
 import { articlesRoutes } from "./routes/articlesRoutes.js"
+import { usersRoutes } from "./routes/usersRoutes.js"
 import mongoose from "mongoose"
 import cors from "cors";
 import dotenv from "dotenv";
@@ -9,6 +10,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 app.use("/api/articles", articlesRoutes)
+app.use("/api/users", usersRoutes)
 dotenv.config()
 
 const port = process.env.PORT || 4000;
