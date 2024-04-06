@@ -1,4 +1,5 @@
 import User from "../models/UserModel.js";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 /***********************************Register User****************************************/
@@ -7,11 +8,11 @@ const registerUser = async (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ error: "All fields are required!!!"})
     }
+
     const exist = await User.findOne({ email});
     if (exist) {
         return res.status(400).json({ error: "User already exists!!!"})
     }
-
     // Hash password
     const salt = await bcrypt.genSalt();
     const hashed = await bcrypt.hash(password, salt);
