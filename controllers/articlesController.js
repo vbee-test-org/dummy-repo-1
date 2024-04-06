@@ -147,5 +147,6 @@ const autocompleteArticleSearch = async (req, res) => {
         res.status(500).json({ error: error.message })
     }
 }
+//TODO: Add get request for specific news source
 
 export { getArticles ,addArticle, deleteArticle, updateArticle, fulltextSearchArticles, autocompleteArticleSearch }  

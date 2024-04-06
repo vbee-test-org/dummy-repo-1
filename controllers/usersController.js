@@ -48,6 +48,7 @@ const loginUser = async (req, res) => {
         res.status(500).json({ error: error.message});
     }
 }
+//TODO: Add subcription to news source
 
 export { registerUser, loginUser } 
 
