@@ -10,7 +10,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subscription: []
+    subscription: [{
+        type: String
+    }]
 }, { timestamps: true });
 const User = mongoose.model("User", UserSchema);
 
