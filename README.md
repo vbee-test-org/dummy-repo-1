@@ -42,7 +42,8 @@ To get started with the project, follow these steps:
     ```bash
     npm run start
     ```
-    >[!TIP] You can change in `package.json` file key `"start": "node server.js"` to `"start": "nodemon server.js` to hot reload evertime you save changes to a file.
+    >[!TIP] 
+    > You can change in `package.json` file key `"start": "node server.js"` to `"start": "nodemon server.js` to hot reload evertime you save changes to a file.
 
 5. Open your browser and navigate to `http://localhost:<PORT>` (or failsafe to `http://localhost:4000`) to check if the server is running.
 6. To send requests and test APIs, I recommend using [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/)
