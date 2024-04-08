@@ -1,6 +1,6 @@
 # News Aggregator MERN
 
-This project is a news aggregator built using the MERN stack (MongoDB, Express.js, React.js, Node.js). It allows users to view and search for news articles from various sources.
+This project is a news aggregator backend built using the MENFX 🤡 stack (MongoDB, Express.js, JavaFX, Node.js). It allows users to view and search for news articles from various sources.
 
 ## Requirements
 
