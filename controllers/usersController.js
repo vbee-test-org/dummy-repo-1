@@ -52,7 +52,7 @@ const loginUser = async (req, res) => {
 const updateUser = async (req, res) => {
     const { email, password, subscribe, unsubscribe } = req.body;
     if (!email) {
-        res.status(400).json({ error: "Email is required!!!"})
+        return res.status(400).json({ error: "Email is required!!!"})
     }
     // Check if user exists
     const user = await User.findOne({ email });
@@ -61,7 +61,7 @@ const updateUser = async (req, res) => {
     } 
     // If there is nothing to update
     if (!password && !subscribe && !unsubscribe) {
-        res.status(400).json({ error: "Undefined behaviour!!!"})
+        return res.status(400).json({ error: "Undefined behaviour!!!"})
     }
     // Update password
     if (password) {

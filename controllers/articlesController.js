@@ -45,7 +45,7 @@ const deleteArticle = async (req, res) => {
         await article.deleteOne();
         res.status(200).json({ success: "Article was deleted" })
     } catch(error) {
-        return res.status(500).json({})
+        res.status(500).json({ error: error.message })
     }
 
 }
