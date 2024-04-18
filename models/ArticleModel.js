@@ -18,7 +18,7 @@ const ArticleSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    article_type: {
+    _type: {
         type: String,
         required: true
     },

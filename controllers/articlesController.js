@@ -71,7 +71,7 @@ const updateArticle = async (req, res) => {
 
     try {
         await article.updateOne({ guid, article_link, website_source, article_title, author, article_type, article_summary, article_detailed_content, creation_date, thumbnail_image });
-        res.status(200).json({ success: "Post was updated" })
+        res.status(200).json({ success: "Article was updated" })
     } catch(error) {
         res.status(500).json({ error: error.message});
     }
