@@ -48,20 +48,20 @@ const loginUser = async (req, res) => {
         res.status(500).json({ error: error.message});
     }
 }
-/***********************************Update User****************************************/
-const updateUser = async (req, res) => {
-    const { email, password, subscribe, unsubscribe } = req.body;
+/***********************************Update User Password****************************************/
+const updateUserPassword = async (req, res) => {
+    const { email, password } = req.body;
     if (!email) {
         return res.status(400).json({ error: "Email is required!!!"})
     }
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(400).json({ error: "User does not exist!!!"})
+        return res.status(404).json({ error: "User does not exist!!!"})
     } 
     // If there is nothing to update
-    if (!password && !subscribe && !unsubscribe) {
-        return res.status(400).json({ error: "Undefined behaviour!!!"})
+    if (!password) {
+        return res.status(400).json({ error: "Password is required!!!"})
     }
     // Update password
     if (password) {
@@ -74,6 +74,23 @@ const updateUser = async (req, res) => {
         } catch(error) {
             res.status(500).json({ error: error.message});
         }
+    }    
+}
+
+/***********************************Update User Subscription****************************************/
+const updateUserSubscription = async (req, res) => {
+    const { email, subscribe, unsubscribe } = req.body;
+    if (!email) {
+        return res.status(400).json({ error: "Email is required!!!"})
+    }
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(404).json({ error: "User does not exist!!!"})
+    } 
+    // If there is nothing to update
+    if (!subscribe && !unsubscribe) {
+        return res.status(400).json({ error: "Subscription is required!!!"})
     }
     // Subscribe to news source
     if (subscribe) {
@@ -99,7 +116,7 @@ const updateUser = async (req, res) => {
             return res.status(400).json({ error: "Subscription does not exist!!!"})
         }
         else {
-           subscription = subscription.filter(sub => sub !== unsubscribe);
+        subscription = subscription.filter(sub => sub !== unsubscribe);
             try {
                 await user.updateOne({ subscription });
                 res.status(200).json({ success: `Subscription ${unsubscribe} deleted for user: ${email}` });
@@ -109,5 +126,5 @@ const updateUser = async (req, res) => {
         }
     }
 }
-export { registerUser, loginUser, updateUser } 
 
+export { registerUser, loginUser, updateUserPassword, updateUserSubscription } 

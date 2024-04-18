@@ -14,10 +14,10 @@ const getCategories = async (req, res) => {
 
 /***********************************Search categories****************************************/
 const searchCategories = async (req, res) => {
-    const { name } = req.query.name;
+    const { name } = req.query.text;
     // If there is no specified name
     if (!name) {
-        return res.status(400).json({ error: "Name is required" });
+        return res.status(400).json({ error: "Category name is required" });
     }
 
     try {

@@ -160,5 +160,33 @@ paths:
         description: 'Show the result'
       500:
         description: 'Show error message'
+  /v1/categories:
+    get:
+      description: 'Get all categories'
+      tags:
+      - 'Categories'
+      responses:
+        200:
+          description: 'Show the number of avaliable categories and an array of articles guid'
+        500:
+          description: 'Show error message'
+  /v1/categories/search?text={text}:
+    get:
+      description: 'Find a category'
+      tags:
+      - 'Categories'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The name of the category you want to search'
+        required: true
+      responses:
+        400:
+          description: 'Category name is required'
+        200:
+          description: 'Found {count} articles for category named {text}'
+        500:
+          description: 'Show error message'
+    
   
 
