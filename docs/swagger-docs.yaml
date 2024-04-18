@@ -1,0 +1,164 @@
+openapi: 3.1.0
+
+info:
+  title: 'News Aggregator APIs'
+  version: 1.0.0
+
+servers:
+- url: 'https://newsaggregator-mern.onrender.com'
+  description: 'Live server'
+
+components:
+  schemas:
+    Article:
+      type: 'object'
+      properties:
+        guid:
+          type: 'string'
+        article_link:
+          type: 'string'
+        website_source:
+          type: 'string'
+        article_title:
+          type: 'string'
+        _type:
+          type: 'string'
+        author:
+          type: 'string'
+        article_summary:
+          type: 'string'
+        article_detailed_content:
+          type: 'string'
+        creation_date:
+          type: 'string'
+        thumbnail_image:
+          type: 'string'
+      example:
+        guid: 'bWFrZWxvdmUsbm90d2FyPw=='
+        article_link: 'foobar.com'
+        website_source: 'foobar'
+        article_title: 'Foo Bar'
+        _type: 'article'
+        author: 'FooBarFooBar'
+        article_summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        article_detailed_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        creation_date: '2021-09-01T00:00:00.000Z'
+        thumbnail_image: 'https://foobar.com/image.jpg'
+
+paths:
+  /v1/articles:
+    get:
+      description: 'Get all articles'
+      tags:
+      - 'Articles'
+      responses:
+        200:
+          description: 'Show the number of avaliable articles and an array of articles'
+        500:
+          description: 'Show error message'
+    post:
+      description: 'Create an article'
+      tags:
+      - 'Articles'
+      requestBody:
+        description: 'Update an existing article'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+      responses:
+        400:
+          description: 'All fields are required!!!'
+        200:
+          description: 'Article created'
+        500:
+          description: 'Show error message'
+  /v1/articles/{id}:
+    delete:
+      description: 'Delete an article'
+      tags:
+      - 'Articles'
+      parameters:
+      - name: 'id'
+        in: 'path'
+        description: 'ID of the article that you want to delete'
+        required: true
+        schema:
+          type: 'string'
+      responses:
+        200:
+          description: 'Article was deleted'
+        400:
+          description: 'Incorrect id'
+        404:
+          description: 'Article not found'
+        500:
+          description: 'Show error message'
+    put:
+      description: 'Update an article'
+      tags:
+      - 'Articles'
+      parameters:
+      - name: 'id'
+        in: 'path'
+        description: 'ID of the article that you want to delete'
+        required: true
+        schema:
+          type: 'string'
+      requestBody:
+        description: 'Update an existing article'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+      responses:
+        200:
+          description: 'Article was updated'
+        400:
+          description: '[ All fields required, Incorrect id ]'
+        404:
+          description: 'Article not found'
+        500:
+          description: 'Show error message'
+  /v1/articles/search?text={text}&sort={sortOrder}:
+    get:
+      description: 'Full-text search'
+      tags:
+      - 'Articles'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The term you want to search'
+        required: true
+        schema:
+          type: 'string'
+      - name: 'sortOrder'
+        in: 'path'
+        description: 'The sort order, `asc` to sort Oldest articles first and `desc` to sort Newest articles first'
+        required: true
+        schema:
+          type: 'string'
+      responses:
+        200:
+          description: 'Show the result'
+        500:
+          description: 'Show error message'
+  /v1/articles/autocomplete:
+    get:
+      description: 'Autocomplete search'
+      tags:
+      - 'Articles'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The term you want to search'
+        required: true
+    responses:
+      200:
+        description: 'Show the result'
+      500:
+        description: 'Show error message'
+  
+

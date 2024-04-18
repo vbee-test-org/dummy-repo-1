@@ -51,8 +51,7 @@ To get started with the project, follow these steps:
 
 | Objects | Links |
 |---------|-------|
-| Articles| [Articles_API](docs/Articles_API.md)  |
-| Users   | [Users_API](docs/Users_API.md)        |
+| Main page| [click here!](https://newsaggregator-mern.onrender.com/api-docs)  |
 
 ## Contributing
 

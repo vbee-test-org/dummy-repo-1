@@ -39,7 +39,7 @@ const deleteArticle = async (req, res) => {
     }
     const article = await Article.findById(req.params.id)
     if (!article) {
-        return res.status(400).json({ error: "Article not found" });
+        return res.status(404).json({ error: "Article not found" });
     }
     try {
         await article.deleteOne();
@@ -66,7 +66,7 @@ const updateArticle = async (req, res) => {
     // Check if article exists
     const article = await Article.findById(req.params.id)
     if (!article) {
-        return res.status(400).json({ error: "Article not found" });
+        return res.status(404).json({ error: "Article not found" });
     }
 
     try {

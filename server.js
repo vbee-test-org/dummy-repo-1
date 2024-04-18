@@ -29,7 +29,7 @@ const swaggerSpec = {
             url: `https://newsaggregator-mern.onrender.com`
         }]
     },
-    apis: ["./routes/*.js"]
+    apis: ["./docs/swagger-docs.yaml"]
 }
 
 
