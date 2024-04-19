@@ -14,6 +14,7 @@ const getCategories = async (req, res) => {
     }
     // Cache miss
     try {
+        console.log("Fetching categories from database");
         const categories = await Category.find().populate("articles");
         const count = categories.length;
         redis.set("categories_content", JSON.stringify({ count, categories }), "EX", 600);
