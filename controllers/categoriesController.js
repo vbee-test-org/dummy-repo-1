@@ -5,7 +5,7 @@ import Category from "../models/CategoryModel.js";
 const getCategories = async (req, res) => {
     try {
         const categories = await Category.find().populate("articles");
-        const count = categories.length();
+        const count = categories.length;
         res.status(200).json({ count, categories });
     } catch(error) {
         res.status(500).json({ error: error.message })
@@ -14,16 +14,11 @@ const getCategories = async (req, res) => {
 
 /***********************************Search categories****************************************/
 const searchCategories = async (req, res) => {
-    // If there is no specified name
-    const { text } = req.query.text;
-    if (!text) {
-        return res.status(400).json({ error: "Category name is required" });
-    }
 
     try {
-        const categories = await Category.find({ name: { $req: text, $options: "i" } });
+        const categories = await Category.findOne({ name: { $regex: req.query.text, $options: "i" } });
         const count = categories.articles_guid.length || 0;
-        res.status(200).json({success: `Found ${count} articles for category named ${text}`});
+        res.status(200).json({success: `Found ${count} articles for category named ${req.query.text}`});
     } catch(error) {
         res.status(500).json({ error: error.message })
     }

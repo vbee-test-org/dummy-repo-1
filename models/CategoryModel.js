@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Article from "./ArticleModel.js";
 
 const CategorySchema = new mongoose.Schema({
     category: {
@@ -10,7 +9,7 @@ const CategorySchema = new mongoose.Schema({
     articles_guid: [{
         type: String,
     }]
-})
+}, { toJSON: { virtuals: true }});
 
 CategorySchema.virtual("articles", {
     ref: 'Article',
