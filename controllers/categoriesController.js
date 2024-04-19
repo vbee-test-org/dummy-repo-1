@@ -14,11 +14,14 @@ const getCategories = async (req, res) => {
 
 /***********************************Search categories****************************************/
 const searchCategories = async (req, res) => {
-
+    const text = req.query.text;
+    if (!text) {
+        return res.status(400).json({ error: "text must not be empty!"})
+    }
     try {
-        const categories = await Category.findOne({ name: { $regex: req.query.text, $options: "i" } });
-        const count = categories.articles_guid.length || 0;
-        res.status(200).json({success: `Found ${count} articles for category named ${req.query.text}`});
+        const categories = await Category.findOne({ category: { $regex: req.query.text } }).populate("articles");
+        const count = categories.length;
+        res.status(200).json({ count, categories });
     } catch(error) {
         res.status(500).json({ error: error.message })
     }

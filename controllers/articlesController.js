@@ -84,7 +84,7 @@ const fulltextSearchArticles = async (req, res) => {
         const pipeline = []
         pipeline.push({
             $search: {
-                index: "searchArticles",
+                index: process.env.MONGODB_SEARCH_INDEX_NAME,
                 text: {
                     query: req.query.text,
                     path: {
@@ -120,7 +120,7 @@ const autocompleteArticleSearch = async (req, res) => {
         const pipeline = []
         pipeline.push({
             $search: {
-                index: "searchArticles",
+                index: process.env.MONGODB_SEARCH_INDEX_NAME,
                 autocomplete: {
                     query: req.query.text,
                     path: "article_title",

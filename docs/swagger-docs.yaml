@@ -21,7 +21,7 @@ components:
           type: 'string'
         article_title:
           type: 'string'
-        _type:
+        type_:
           type: 'string'
         author:
           type: 'string'

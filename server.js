@@ -39,7 +39,7 @@ app.use("/v1/articles", articlesRoutes)
 app.use("/v1/categories", categoriesRoutes)
 app.use("/v1/users", usersRoutes)
 
-mongoose.connect(connectionSTring, { dbName: "WebData" })
+mongoose.connect(connectionSTring, { dbName: process.env.MONGODB_DATABASE_NAME })
     .then(() => {
         console.log("Connected successfully to MongoDB");
         app.listen(port, () => {console.log(`Listening on port ${port}`)});
