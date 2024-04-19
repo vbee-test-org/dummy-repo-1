@@ -1,11 +1,23 @@
 import mongoose from "mongoose";
 import Article from "../models/ArticleModel.js";
+import { Redis } from "ioredis";
 
 /***********************************Get articles****************************************/
 const getArticles = async (req, res) => {
+    // Redis instance
+    const redis = new Redis(process.env.REDIS_URL);
+    const articlesCache = await redis.get("articles_content");
+    // Cache hit
+    if (articlesCache) {
+        console.log("Fetching articles from cache");
+        return res.status(200).json(JSON.parse(articlesCache));
+    }
+    // Cache miss
     try {
+        console.log("Fetching articles from database");
         const articles = await Article.find();
         const count = articles.length;
+        redis.set("articles_content", JSON.stringify({ count, articles }), "EX", 600);
         res.status(200).json({ count, articles });
     } catch(error) {
         res.status(500).json({ error: error.message })
