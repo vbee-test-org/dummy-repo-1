@@ -44,6 +44,16 @@ components:
         article_detailed_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
         creation_date: '2021-09-01T00:00:00.000Z'
         thumbnail_image: 'https://foobar.com/image.jpg'
+    User:
+      type: 'object'
+      properties:
+        email:
+          type: 'string'
+        password:
+          type: 'string'
+      example:
+        email: 'loremipsum@gmail.com'
+        password: 'loremipsum'
 
 paths:
   /v1/articles:
@@ -187,6 +197,97 @@ paths:
           description: 'Found {count} articles for category named {text}'
         500:
           description: 'Show error message'
+  /v1/users/signup:
+    post:
+      description: 'Register a new user'
+      tags:
+      - 'Users'
+      requestBody:
+        description: 'Adding user credentials'
+        required: true
+        content:
+          application/json:
+            schema:
+              email:
+                type: 'string'
+              password:
+                type: 'string'
+            example:
+              email: 'loremipsum@gmail.com'
+              password: 'loremipsum'
+      responses:
+        200:
+          description: 'Show the registered email'
+        400:
+          description: '[ All fields are required, User already exists ]'
+        500:
+          description: 'Show error message'
+  /v1/users/login:
+    post:
+      description: 'Login existing user'
+      tags:
+      - 'Users'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: "Show the login account's email"
+        400:
+          description: '[ All fields are required, Incorrect email, Incorrect password ]'
+        500:
+          description: 'Show error message'
+  /v1/users/updatepw:
+    put:
+      description: 'Update password for existing users'
+      tags:
+      - 'Users'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+  /v1/users/subscription:
+    put:
+      description: 'Update exsting users subscription'
+      tags:
+      - 'Users'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              email:
+                type: 'string'
+              subscribe:
+                type: 'string'
+                description: 'The name of the news provider user want to subscribe'
+              unsubscribe:
+                type: 'string'
+                description: 'The name of the news provider user want to unsubscribe'
+            examples:
+              Subscribe:
+                value:
+                  email: 'loremipsum@gmail.com'
+                  subscribe: 'crypto.news'
+              Unsubscribe:
+                value:
+                  email: 'loremipsum@gmail.com'
+                  unsubscibe: 'crypto.news'
+      responses:
+        200:
+          description: 'Success'
+        400:
+          description: '[ Email is required, 
+                          Subscription is required, 
+                          Subscription already exist if you subscribe to an already subscribed source, 
+                          Subscription does not exist if you unsubscibe to a news source that you have not yet subscribe ]'
+        404:
+          description: 'User does not exist'
+        500:
+          description: 'Show error message'
+
     
   
 
