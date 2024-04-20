@@ -17,8 +17,9 @@ const getCategories = async (req, res) => {
         console.log("Fetching categories from database");
         const categories = await Category.find().populate("articles");
         const count = categories.length;
-        redis.set("categories_content", JSON.stringify({ count, categories }), "EX", 600);
-        res.status(200).json({ count, categories });
+        const [{ _id, category, articles }] = categories;
+        redis.set("categories_content", JSON.stringify({ count, categories: [{ _id, category, articles }] }), "EX", 600);
+        res.status(200).json({ count, categories: [{ _id, category, articles }] });
     } catch(error) {
         res.status(500).json({ error: error.message })
     }
@@ -31,9 +32,9 @@ const searchCategories = async (req, res) => {
         return res.status(400).json({ error: "text must not be empty!"})
     }
     try {
-        const categories = await Category.findOne({ category: { $regex: req.query.text } }).populate("articles");
-        const count = categories.length;
-        res.status(200).json({ count, categories });
+        const category1 = await Category.findOne({ category: { $regex: req.query.text } }).populate("articles");
+        const { _id, category, articles } = category1;
+        res.status(200).json({ category: { _id, category, articles } });
     } catch(error) {
         res.status(500).json({ error: error.message })
     }
