@@ -123,9 +123,13 @@ const fulltextSearchArticles = async (req, res) => {
         pipeline.push({
             $project: {
                 _id: 0,
+                guid: 1,
                 article_title: 1,
+                article_link: 1,
                 author: 1,
+                website_source: 1,
                 article_summary: 1,
+                article_detailed_content: 1,
                 thumbnail_image: 1,
                 creation_date: 1,
                 score: { $meta: "searchScore" },
