@@ -6,6 +6,18 @@ import { Redis } from "ioredis";
 const getArticles = async (req, res) => {
     // Redis instance
     const redis = new Redis(process.env.REDIS_URL);
+    // Get last modified date and check if the request has been modified
+    const ifModifiedSince = req.get("If-Modified-Since");
+    if (ifModifiedSince) {
+        try {
+            const {creation_date: lastModified} = await Article.findOne({}, { creation_date: 1, _id: 0 }, { sort: { creation_date: -1 } });
+            if (lastModified && new Date(ifModifiedSince) >= new Date(lastModified)) {
+                return res.status(304).send();
+            }
+        } catch(error) {
+            console.log(error.message);
+        }
+    }
     const articlesCache = await redis.get("articles_content");
     // Cache hit
     if (articlesCache) {
@@ -17,6 +29,7 @@ const getArticles = async (req, res) => {
         console.log("Fetching articles from database");
         const articles = await Article.find();
         const count = articles.length;
+        // Setting cache
         redis.set("articles_content", JSON.stringify({ count, articles }), "EX", 600);
         res.status(200).json({ count, articles });
     } catch(error) {
