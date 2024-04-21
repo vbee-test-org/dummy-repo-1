@@ -31,6 +31,7 @@ const getArticles = async (req, res) => {
     const count = articles.length;
     // Setting cache
     redis.set("articles_content", JSON.stringify({ count, articles }), "EX", 600);
+    redis.quit();
     res.status(200).json({ count, articles });
   } catch (error) {
     res.status(500).json({ error: error.message })
