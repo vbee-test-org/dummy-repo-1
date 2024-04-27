@@ -31,16 +31,16 @@ const getArticles = async (req, res) => {
   try {
     console.log("Fetching articles from database");
     const articles = await Article.find()
-      .populate("publishers")
+      .populate("publisher")
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ creation_date: -1 });
     const count = await Article.countDocuments();
-    const [{ _id, guid, article_link, publishers, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] = articles;
+    const [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] = articles;
     // Setting cache
-    redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles: [{ _id, guid, article_link, publishers, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] }), "EX", 600);
+    redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles: [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] }), "EX", 600);
     redis.quit();
-    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles: [{ _id, guid, article_link, publishers, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] });
+    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles: [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

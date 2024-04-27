@@ -48,7 +48,7 @@ const ArticleSchema = new mongoose.Schema({
   }]
 }, { toJSON: { virtuals: true } });
 
-ArticleSchema.virtual("publishers", {
+ArticleSchema.virtual("publisher", {
   ref: 'ArticlePublisher',
   localField: 'website_source',
   foreignField: 'ref_name'
