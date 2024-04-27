@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const CategorySchema = new mongoose.Schema({
+const ArticleCategorySchema = new mongoose.Schema({
     category: {
         type: String,
         unique: true,
@@ -11,12 +11,12 @@ const CategorySchema = new mongoose.Schema({
     }]
 }, { toJSON: { virtuals: true }});
 
-CategorySchema.virtual("articles", {
+ArticleCategorySchema.virtual("articles", {
     ref: 'Article',
     localField: "articles_guid",
     foreignField: "guid"  
 });
 
-const Category = mongoose.model("Category", CategorySchema)
+const ArticleCategory = mongoose.model("ArticleCategory", ArticleCategorySchema, "articles.categories")
 
-export default Category
+export default ArticleCategory

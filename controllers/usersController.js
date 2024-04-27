@@ -1,5 +1,4 @@
 import User from "../models/UserModel.js";
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 /***********************************Register User****************************************/
@@ -9,7 +8,7 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ error: "All fields are required!!!"})
     }
 
-    const exist = await User.findOne({ email});
+    const exist = await User.findOne({ email });
     if (exist) {
         return res.status(400).json({ error: "User already exists!!!"})
     }
@@ -19,7 +18,7 @@ const registerUser = async (req, res) => {
 
     try {
         const user = await User.create({ email, password: hashed });
-        res.status(200).json({ email });
+        res.status(200).json({ success: `Account created for ${email}` });
     } catch(error) {
         res.status(500).json({ error: error.message});
     }
@@ -43,7 +42,7 @@ const loginUser = async (req, res) => {
     }
 
     try {
-        res.status(200).json({ email });
+        res.status(200).json({ success: `Successfully logined to ${email}` });
     } catch(error) {
         res.status(500).json({ error: error.message});
     }
@@ -112,7 +111,6 @@ const updateUserSubscription = async (req, res) => {
     if (unsubscribe) {
         var subscription = user.subscription;
         if (!(subscription.includes(unsubscribe))) {
-            user.subscription.pull(subscription);
             return res.status(400).json({ error: "Subscription does not exist!!!"})
         }
         else {

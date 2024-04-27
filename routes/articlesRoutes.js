@@ -1,5 +1,5 @@
 import express from "express"
-import { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchArticles, autocompleteArticleSearch } from "../controllers/articlesController.js";
+import { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchArticles, autocompleteArticleSearch } from "../controllers/articlesController.js"
 
 const router = express.Router()
 

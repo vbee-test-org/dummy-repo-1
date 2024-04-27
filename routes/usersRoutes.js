@@ -1,5 +1,5 @@
 import express from "express"
-import { registerUser, loginUser, updateUserPassword, updateUserSubscription } from "../controllers/usersController.js";
+import { registerUser, loginUser, updateUserPassword, updateUserSubscription } from "../controllers/usersController.js"
 
 const router = express.Router()
 
@@ -10,7 +10,7 @@ router.post("/signup", registerUser);
 router.post("/login", loginUser);
 
 // Update user password
-router.put("/updatepw", updateUserPassword);
+router.put("/credentials", updateUserPassword);
 
 // Update user subscription
 router.put("/subscription", updateUserSubscription);

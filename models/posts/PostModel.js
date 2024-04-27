@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
 
-const ArticleSchema = new mongoose.Schema({
+const PostSchema = new mongoose.Schema({
     guid: {
         type: String,
         required: true,
-        unique: true
     },
-    article_link: {
+    post_link: {
         type: String,
         required: true
     },
@@ -14,11 +13,11 @@ const ArticleSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    article_title: {
+    type_: {
         type: String,
         required: true
     },
-    type_: {
+    post_title: {
         type: String,
         required: true
     },
@@ -26,24 +25,28 @@ const ArticleSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    article_summary: {
-        type: String,
-        required: true
-    },
-    article_detailed_content: {
-        type: String,
-        required: true
-    },
     creation_date: {
         type: String,
         required: true
     },
-    thumbnail_image: {
+    post_content: {
         type: String,
         required: true
-    }
-})
+    },
+    upvotes: {
+        type: Number,
+        required: true
+    },
+    downvotes: {
+        type: Number,
+        required: true
+    },
+    categories: [{
+        type: String,
+        required: true
+    }]
+});
 
-const Article = mongoose.model("Article", ArticleSchema)
+const Post = mongoose.model("Post", PostSchema, "posts");
 
-export default Article
+export default Post;
