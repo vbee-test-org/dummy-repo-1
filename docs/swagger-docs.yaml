@@ -33,6 +33,10 @@ components:
           type: 'string'
         thumbnail_image:
           type: 'string'
+        categories:
+          type: 'array'
+          items:
+            type: 'string'
       example:
         guid: 'bWFrZWxvdmUsbm90d2FyPw=='
         article_link: 'foobar.com'
@@ -44,6 +48,7 @@ components:
         article_detailed_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
         creation_date: '2021-09-01T00:00:00.000Z'
         thumbnail_image: 'https://foobar.com/image.jpg'
+        categories: ['foo', 'bar']
     User:
       type: 'object'
       properties:
@@ -54,24 +59,78 @@ components:
       example:
         email: 'loremipsum@gmail.com'
         password: 'loremipsum'
+    Post:
+      type: 'object'
+      properties:
+        guid:
+          type: 'string'
+        post_link:
+          type: 'string'
+        website_source:
+          type: 'string'
+        post_title:
+          type: 'string'
+        type_:
+          type: 'string'
+        author:
+          type: 'string'
+        post_content:
+          type: 'string'
+        creation_date:
+          type: 'string'
+        upvotes:
+          type: 'number'
+        downvotes:
+          type: 'number'
+        categories:
+          type: 'array'
+          items:
+            type: 'string'
+      example:
+        guid: 'bWFrZWxvdmUsbm90d2FyPw=='
+        post_link: 'foobar.com'
+        website_source: 'foobar'
+        post_title: 'Foo Bar'
+        type_: 'post'
+        author: 'FooBarFooBar'
+        post_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        creation_date: '2021-09-01T00:00:00.000Z'
+        upvotes: 84
+        downvotes: 0
+        categories: ['foo', 'bar']
 
 paths:
-  /v1/articles:
+  /v1/articles?page={page}&limit={limit}:
     get:
       description: 'Get all articles'
       tags:
       - 'Articles'
+      parameters:
+      - name: 'page'
+        in: 'query'
+        description: 'The page number you want to get'
+        required: true
+        schema:
+          type: 'number'
+      - name: 'limit'
+        in: 'query'
+        description: 'The number of articles you want to get'
+        required: true
+        schema:
+          type: 'number'
       responses:
         200:
           description: 'Show the number of avaliable articles and an array of articles'
         500:
           description: 'Show error message'
+  
+  /v1/articles:
     post:
       description: 'Create an article'
       tags:
       - 'Articles'
       requestBody:
-        description: 'Update an existing article'
+        description: 'Create an article'
         required: true
         content:
           application/json:
@@ -84,6 +143,7 @@ paths:
           description: 'Article created'
         500:
           description: 'Show error message'
+
   /v1/articles/{id}:
     delete:
       description: 'Delete an article'
@@ -105,6 +165,7 @@ paths:
           description: 'Article not found'
         500:
           description: 'Show error message'
+    
     put:
       description: 'Update an article'
       tags:
@@ -132,6 +193,7 @@ paths:
           description: 'Article not found'
         500:
           description: 'Show error message'
+
   /v1/articles/search?text={text}&sort={sortOrder}:
     get:
       description: 'Full-text search'
@@ -155,6 +217,7 @@ paths:
           description: 'Show the result'
         500:
           description: 'Show error message'
+
   /v1/articles/autocomplete:
     get:
       description: 'Autocomplete search'
@@ -170,9 +233,58 @@ paths:
         description: 'Show the result'
       500:
         description: 'Show error message'
-  /v1/categories:
+
+  /v1/posts?page={page}&limit={limit}:
     get:
-      description: 'Get all categories'
+      description: 'Get all posts'
+      tags:
+      - 'Posts'
+      parameters:
+      - name: 'page'
+        in: 'query'
+        description: 'The page number you want to get'
+        required: true
+        schema:
+          type: 'number'
+      - name: 'limit'
+        in: 'query'
+        description: 'The number of posts you want to get'
+        required: true
+        schema:
+          type: 'number'
+      responses:
+        200:
+          description: 'Show the number of avaliable posts and an array of posts'
+        500:
+          description: 'Show error message'
+
+  /v1/posts/search?text={text}&sort={sortOrder}:
+    get:
+      description: 'Full-text search'
+      tags:
+      - 'Posts'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The term you want to search'
+        required: true
+        schema:
+          type: 'string'
+      - name: 'sortOrder'
+        in: 'path'
+        description: 'The sort order, `asc` to sort Oldest posts first and `desc` to sort Newest posts first'
+        required: true
+        schema:
+          type: 'string'
+      responses:
+        200:
+          description: 'Show the result'
+        500:
+          description: 'Show error message'
+
+  /v1/categories/articles:
+    get:
+      description: 'Get all categories for articles'
       tags:
       - 'Categories'
       responses:
@@ -180,9 +292,10 @@ paths:
           description: 'Show the number of avaliable categories and an array of articles guid'
         500:
           description: 'Show error message'
-  /v1/categories/search?text={text}:
+
+  /v1/categories/articles/search?text={text}:
     get:
-      description: 'Find a category'
+      description: 'Find a category for articles'
       tags:
       - 'Categories'
       parameters:
@@ -194,9 +307,39 @@ paths:
         400:
           description: 'Category name is required'
         200:
-          description: 'Found {count} articles for category named {text}'
+          description: 'Found {count} articles for categories named {text}'
         500:
           description: 'Show error message'
+
+  /v1/categories/posts:
+    get:
+      description: 'Get all categories for posts'
+      tags:
+      - 'Categories'
+      responses:
+        200:
+          description: 'Show the number of avaliable categories and an array of posts guid'
+        500:
+          description: 'Show error message'
+
+  /v1/categories/posts/search?text={text}:
+    get:
+      description: 'Find a category for posts'
+      tags:
+      - 'Categories'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The name of the category you want to search'
+        required: true
+      responses:
+        400:
+          description: 'Category name is required'
+        200:
+          description: 'Found {count} posts for categories named {text}'
+        500:
+          description: 'Show error message'
+
   /v1/users/signup:
     post:
       description: 'Register a new user'
@@ -222,6 +365,7 @@ paths:
           description: '[ All fields are required, User already exists ]'
         500:
           description: 'Show error message'
+
   /v1/users/login:
     post:
       description: 'Login existing user'
@@ -239,7 +383,8 @@ paths:
           description: '[ All fields are required, Incorrect email, Incorrect password ]'
         500:
           description: 'Show error message'
-  /v1/users/updatepw:
+
+  /v1/users/credentials:
     put:
       description: 'Update password for existing users'
       tags:
@@ -249,6 +394,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
+
   /v1/users/subscription:
     put:
       description: 'Update exsting users subscription'

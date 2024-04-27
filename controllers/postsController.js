@@ -17,7 +17,8 @@ const getPosts = async (req, res) => {
         console.log(error.message);
       }
     }
-    const { page, limit } = req.body;
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
     const articlesCache = await redis.get(`posts_content_${page}`);
     // Cache hit
     if (articlesCache) {
