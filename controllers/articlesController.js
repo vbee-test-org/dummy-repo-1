@@ -31,9 +31,9 @@ const getArticles = async (req, res) => {
   try {
     console.log("Fetching articles from database");
     const articles = await Article.find()
-      .populate("publisher")
       .skip((page - 1) * limit)
       .limit(limit)
+      .populate("publisher")
       .sort({ creation_date: -1 });
     const count = await Article.countDocuments();
     const [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] = articles;
