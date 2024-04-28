@@ -36,7 +36,6 @@ const getArticles = async (req, res) => {
       .limit(limit)
       .populate("publisher");
     const count = await Article.countDocuments();
-    res.json(_id);
     // Setting cache
     redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
     redis.quit();
