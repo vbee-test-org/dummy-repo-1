@@ -76,8 +76,8 @@ const fulltextSearchPosts = async (req, res) => {
       }
     })
 
-    const result = await Post.aggregate(pipeline).sort({ creation_date: req.query.sort === "desc" ? -1 : 1 });
-    res.status(200).json({ result });
+    const posts = await Post.aggregate(pipeline).sort({ score: -1, creation_date: req.query.sort === "desc" ? -1 : 1 });
+    res.status(200).json({ posts });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
