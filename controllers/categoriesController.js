@@ -22,6 +22,18 @@ const getArticleCategories = async (req, res) => {
     });
 
     pipeline.push({
+      $addFields: { categorySize:  { $size: "$articles_guid" }}
+    })
+
+    pipeline.push({
+      $sort: { categorySize: -1}
+    });
+
+    pipeline.push({
+      $limit: 20
+    });
+
+    pipeline.push({
       $lookup: {
         from: "articles",
         localField: "articles_guid",

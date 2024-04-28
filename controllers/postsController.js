@@ -49,8 +49,8 @@ const getPosts = async (req, res) => {
       }
 
       pipeline.push({
-        $rename: { website_source: "subreddit" }
-      })
+        $set: { subreddit: "$website_source" }
+      });
 
       pipeline.push({
         $project: {
@@ -96,11 +96,11 @@ const fulltextSearchPosts = async (req, res) => {
           fuzzy: {}
         },
       },
-    })
+    });
 
     pipeline.push({
-      $rename: { website_source: "subreddit" }
-    })
+      $set: { subreddit: "$website_source" }
+    });
 
     pipeline.push({
       $project: {
@@ -118,7 +118,7 @@ const fulltextSearchPosts = async (req, res) => {
         categories: 1,
         score: { $meta: "searchScore" },
       }
-    })
+    });
 
     const posts = await Post.aggregate(pipeline);
     res.status(200).json({ posts });
