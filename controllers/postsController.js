@@ -17,8 +17,8 @@ const getPosts = async (req, res) => {
         console.log(error.message);
       }
     }
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = Number(req.query.page) || null;
+    const limit = Number(req.query.limit) || null;
     const articlesCache = await redis.get(`posts_content_${page}`);
     // Cache hit
     if (articlesCache) {
@@ -28,10 +28,49 @@ const getPosts = async (req, res) => {
     // Cache miss
     try {
       console.log("Fetching posts from database");
-      const posts = await Post.find()
-                        .skip((page -1) * limit)
-                        .limit(limit)
-                        .sort({ creation_date: -1 });
+      const pipeline = [];
+
+      pipeline.push({
+        $match: {}
+      });
+
+      pipeline.push({
+        $sort: { creation_date: -1 }
+      });
+
+      if (page !== null) {
+        pipeline.push({
+          $skip: (page - 1) * limit
+        });
+
+        pipeline.push({
+          $limit: limit
+        });
+      }
+
+      pipeline.push({
+        $rename: { website_source: "subreddit" }
+      })
+
+      pipeline.push({
+        $project: {
+          _id: 0,
+          guid: 1,
+          type_: 1,
+          post_title: 1,
+          post_link: 1,
+          author: 1,
+          subreddit: 1,
+          post_content: 1,
+          creation_date: 1,
+          upvotes: 1,
+          downvotes: 1,
+          categories: 1
+        }
+      });
+      
+
+      const posts = await Post.aggregate(pipeline);
       const count = await Post.countDocuments();
       // Setting cache
       redis.set(`posts_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
@@ -60,13 +99,18 @@ const fulltextSearchPosts = async (req, res) => {
     })
 
     pipeline.push({
+      $rename: { website_source: "subreddit" }
+    })
+
+    pipeline.push({
       $project: {
         _id: 0,
         guid: 1,
+        type_: 1,
         post_title: 1,
         post_link: 1,
         author: 1,
-        website_source: 1,
+        subreddit: 1,
         post_content: 1,
         creation_date: 1,
         upvotes: 1,
@@ -76,7 +120,7 @@ const fulltextSearchPosts = async (req, res) => {
       }
     })
 
-    const posts = await Post.aggregate(pipeline).sort({ score: -1, creation_date: req.query.sort === "desc" ? -1 : 1 });
+    const posts = await Post.aggregate(pipeline);
     res.status(200).json({ posts });
   } catch (error) {
     res.status(500).json({ error: error.message })

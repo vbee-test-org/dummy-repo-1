@@ -15,7 +15,54 @@ const getArticleCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for articles from database");
-    const categories = await ArticleCategory.find().populate("articles");
+    const pipeline = [];
+
+    pipeline.push({
+      $match: {}
+    });
+
+    pipeline.push({
+      $lookup: {
+        from: "articles",
+        localField: "articles_guid",
+        foreignField: "guid",
+        as: "articles"
+      }
+    });
+
+    pipeline.push({
+      $lookup: {
+        from: "articles.publishers",
+        localField: "articles.website_source",
+        foreignField: "ref_name",
+        as: "publisher",
+      }
+    });
+
+    pipeline.push({
+      $unwind: "$publisher"
+    });
+
+
+    pipeline.push({
+      $project: {
+        _id: 0,
+        category: 1,
+        articles: {
+          guid: 1,
+          type: 1,
+          article_title: 1,
+          article_link: 1,
+          article_summary: 1,
+          article_detailed_content: 1,
+          creation_date: 1,
+          thumbnail_image: 1,
+          categories: 1
+        }
+      }
+    })
+
+    const categories = await ArticleCategory.aggregate(pipeline);
     const count = categories.length;
     redis.set("article_categories_content", JSON.stringify({ count, categories }), "EX", 600);
     redis.quit();
@@ -52,6 +99,8 @@ const getPostCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for posts from database");
+
+
     const categories = await PostCategory.find().populate("posts");
     const count = categories.length;
     redis.set("post_categories_content", JSON.stringify({ count, categories }), "EX", 600);

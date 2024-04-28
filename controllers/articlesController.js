@@ -19,8 +19,9 @@ const getArticles = async (req, res) => {
       console.log(error.message);
     }
   }
-  const page = req.query.page || null;
-  const limit = req.query.limit || null;
+  // Get params
+  const page = Number(req.query.page) || null;
+  const limit = Number(req.query.limit) || null;
   const articlesCache = await redis.get(`articles_content_${page}`);
   // Cache hit
   if (articlesCache) {
@@ -30,11 +31,58 @@ const getArticles = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching articles from database");
-    var articles = await Article.find()
-      .sort({ creation_date: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .populate("publisher");
+    const pipeline = [];
+
+    pipeline.push({
+      $match: {}
+    });
+
+    pipeline.push({
+      $sort: { creation_date: -1 }
+    });
+
+    if (page !== null) {
+      pipeline.push({
+        $skip: (page - 1) * limit
+      });
+
+      pipeline.push({
+        $limit: limit
+      });
+    }
+
+    pipeline.push({
+      $lookup: {
+        from: "articles.publishers",
+        localField: "website_source",
+        foreignField: "ref_name",
+        as: "publisher",
+      }
+    });
+
+    pipeline.push({
+      $unwind: "$publisher"
+    });
+
+    pipeline.push({
+      $project: {
+        _id: 0,
+        guid: 1,
+        type_: 1,
+        article_title: 1,
+        article_link: 1,
+        author: 1,
+        website_source: 0,
+        publisher: 1,
+        article_summary: 1,
+        article_detailed_content: 1,
+        thumbnail_image: 1,
+        creation_date: 1,
+        categories: 1,
+      }
+    });
+
+    const articles = await Article.aggregate(pipeline);
     const count = await Article.countDocuments();
     // Setting cache
     redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
@@ -128,13 +176,28 @@ const fulltextSearchArticles = async (req, res) => {
     })
 
     pipeline.push({
+      $lookup: {
+        from: "articles.publishers",
+        localField: "website_source",
+        foreignField: "ref_name",
+        as: "publisher",
+      }
+    })
+
+    pipeline.push({
+      $unwind: "$publisher"
+    })
+
+    pipeline.push({
       $project: {
         _id: 0,
         guid: 1,
+        type_: 1,
         article_title: 1,
         article_link: 1,
         author: 1,
-        website_source: 1,
+        website_source: 0,
+        publisher: 1,
         article_summary: 1,
         article_detailed_content: 1,
         thumbnail_image: 1,
@@ -144,7 +207,7 @@ const fulltextSearchArticles = async (req, res) => {
       }
     })
 
-    const articles = await Article.aggregate(pipeline).sort({ score: -1, creation_date: req.query.sort === "desc" ? -1 : 1 });
+    const articles = await Article.aggregate(pipeline);
     res.status(200).json({ articles });
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -167,17 +230,33 @@ const autocompleteArticleSearch = async (req, res) => {
     })
 
     pipeline.push({
+      $lookup: {
+        from: "articles.publishers",
+        localField: "website_source",
+        foreignField: "ref_name",
+        as: "publisher",
+      }
+    })
+
+    pipeline.push({
+      $unwind: "$publisher"
+    })
+
+    pipeline.push({
       $project: {
         _id: 0,
         guid: 1,
+        type_: 1,
         article_title: 1,
         article_link: 1,
         author: 1,
-        website_source: 1,
+        website_source: 0,
+        publisher: 1,
         article_summary: 1,
         article_detailed_content: 1,
         thumbnail_image: 1,
         creation_date: 1,
+        categories: 1,
         score: { $meta: "searchScore" },
       }
     })
