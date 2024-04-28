@@ -19,9 +19,9 @@ const getArticles = async (req, res) => {
       console.log(error.message);
     }
   }
-  const page = req.query.page || 1;
-  const limit = req.query.limit || 10;
-  const articlesCache = await redis.get(`articles_content_${page.toString()}`);
+  const page = req.query.page || null;
+  const limit = req.query.limit || null;
+  const articlesCache = await redis.get(`articles_content_${page}`);
   // Cache hit
   if (articlesCache) {
     console.log("Fetching articles from cache");
@@ -30,17 +30,17 @@ const getArticles = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching articles from database");
-    const articles = await Article.find()
+    var articles = await Article.find()
+      .sort({ creation_date: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate("publisher")
-      .sort({ creation_date: -1 });
+      .populate("publisher");
     const count = await Article.countDocuments();
-    const [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] = articles;
+    res.json(_id);
     // Setting cache
-    redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles: [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] }), "EX", 600);
+    redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
     redis.quit();
-    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles: [{ _id, guid, article_link, publisher, article_title, type_, author, article_summary, article_detailed_content, creation_date, thumbnail_image, categories }] });
+    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
