@@ -10,70 +10,63 @@ const getArticleCategories = async (req, res) => {
   // Cache hit
   if (categoriesCache) {
     console.log("Fetching categories for articles from cache");
+    redis.quit();
     return res.status(200).json(JSON.parse(categoriesCache));
   }
   // Cache miss
   try {
     console.log("Fetching categories for articles from database");
+    // Pipeline
     const pipeline = [];
-
-    pipeline.push({
-      $match: {}
-    });
-
-    pipeline.push({
-      $addFields: { categorySize:  { $size: "$articles_guid" }}
-    })
-
-    pipeline.push({
-      $sort: { categorySize: -1}
-    });
-
-    pipeline.push({
-      $limit: 20
-    });
-
+    pipeline.push({ $addFields: { categoryPopulation: { $size: "$articles_guid" } } })
+    pipeline.push({ $sort: { categoryPopulation: -1 } });
+    pipeline.push({ $limit: 10 });
+    pipeline.push({ $unwind: "$articles_guid" });
     pipeline.push({
       $lookup: {
         from: "articles",
         localField: "articles_guid",
         foreignField: "guid",
-        as: "articles"
+        as: "articles",
+        pipeline: [
+          { $sort: { creation_date: -1 } },
+          { $limit: 5 },
+          { $lookup: { from: "articles.publishers", localField: "website_source", foreignField: "ref_name", as: "publisher" } },
+          { $unwind: "$publisher" }
+        ]
       }
     });
-
     pipeline.push({
-      $lookup: {
-        from: "articles.publishers",
-        localField: "articles.website_source",
-        foreignField: "ref_name",
-        as: "publisher",
+      $group: {
+        _id: "$category",
+        articles: { $push: "$articles" }
       }
     });
-
-    pipeline.push({
-      $unwind: "$publisher"
-    });
-
-
     pipeline.push({
       $project: {
         _id: 0,
-        category: 1,
+        category: "$_id",
         articles: {
-          guid: 1,
-          type: 1,
-          article_title: 1,
-          article_link: 1,
-          article_summary: 1,
-          article_detailed_content: 1,
-          creation_date: 1,
-          thumbnail_image: 1,
-          categories: 1
+          $map: {
+            input: "$articles",
+            as: "article",
+            in: {
+              guid: { $arrayElemAt: ["$$article.guid", 0] },
+              article_link: { $arrayElemAt: ["$$article.article_link", 0] },
+              publisher: { $arrayElemAt: ["$$article.publisher", 0] },
+              article_title: { $arrayElemAt: ["$$article.article_title", 0] },
+              type_: { $arrayElemAt: ["$$article.type_", 0] },
+              author: { $arrayElemAt: ["$$article.author", 0] },
+              article_summary: { $arrayElemAt: ["$$article.article_summary", 0] },
+              article_detailed_content: { $arrayElemAt: ["$$article.article_detailed_content", 0] },
+              creation_date: { $arrayElemAt: ["$$article.creation_date", 0] },
+              thumbnail_image: { $arrayElemAt: ["$$article.thumbnail_image", 0] },
+              categories: { $arrayElemAt: ["$$article.categories", 0] },
+            }
+          }
         }
       }
-    })
-
+    });
     const categories = await ArticleCategory.aggregate(pipeline);
     const count = categories.length;
     redis.set("article_categories_content", JSON.stringify({ count, categories }), "EX", 600);
@@ -92,7 +85,7 @@ const searchArticleCategories = async (req, res) => {
   }
   try {
     const categories = await ArticleCategory.find({ category: { $regex: req.query.text } }).populate("articles");
-    res.status(200).json({ categories});
+    res.status(200).json({ categories });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
@@ -106,14 +99,62 @@ const getPostCategories = async (req, res) => {
   // Cache hit
   if (categoriesCache) {
     console.log("Fetching categories for posts from cache");
+    redis.quit();
     return res.status(200).json(JSON.parse(categoriesCache));
   }
   // Cache miss
   try {
     console.log("Fetching categories for posts from database");
-
-
-    const categories = await PostCategory.find().populate("posts");
+    // Pipeline
+    const pipeline = [];
+    pipeline.push({ $addFields: { categoryPopulation: { $size: "$posts_guid" } } })
+    pipeline.push({ $sort: { categoryPopulation: -1 } });
+    pipeline.push({ $limit: 10 });
+    pipeline.push({ $unwind: "$posts_guid" });
+    pipeline.push({
+      $lookup: {
+        from: "posts",
+        localField: "posts_guid",
+        foreignField: "guid",
+        as: "posts",
+        pipeline: [
+          { $sort: { creation_date: -1 } },
+          { $limit: 5 }
+        ]
+      }
+    });
+    pipeline.push({
+      $group: {
+        _id: "$category",
+        posts: { $push: "$posts" }
+      }
+    });
+    pipeline.push({
+      $project: {
+        _id: 0,
+        category: "$_id",
+        posts: {
+          $map: {
+            input: "$posts",
+            as: "post",
+            in: {
+              guid: { $arrayElemAt: ["$$post.guid", 0] },
+              post_link: { $arrayElemAt: ["$$post.post_link", 0] },
+              post_title: { $arrayElemAt: ["$$post.post_title", 0] },
+              type_: { $arrayElemAt: ["$$post.type_", 0] },
+              website_source: { $arrayElemAt: ["$$post.website_source", 0] },
+              author: { $arrayElemAt: ["$$post.author", 0] },
+              creation_date: { $arrayElemAt: ["$$post.creation_date", 0] },
+              post_content: { $arrayElemAt: ["$$post.post_content", 0] },
+              upvotes: { $arrayElemAt: ["$$post.upvotes", 0] },
+              downvotes: { $arrayElemAt: ["$$post.downvotes", 0] },
+              categories: { $arrayElemAt: ["$$post.categories", 0] }
+            }
+          }
+        }
+      }
+    });
+    const categories = await PostCategory.aggregate(pipeline);
     const count = categories.length;
     redis.set("post_categories_content", JSON.stringify({ count, categories }), "EX", 600);
     redis.quit();

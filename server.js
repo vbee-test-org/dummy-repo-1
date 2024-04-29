@@ -20,17 +20,17 @@ dotenv.config()
 const port = process.env.PORT || 4000;
 const connectionSTring = process.env.CONNECTION_STRING;
 const swaggerSpec = {
-    definition: {
-        openapi: "3.1.0",
-        info: {
-            title: "News Aggregator APIs",
-            version: "1.0.0",
-        },
-        servers: [{
-            url: `https://newsaggregator-mern.onrender.com`
-        }]
+  definition: {
+    openapi: "3.1.0",
+    info: {
+      title: "News Aggregator APIs",
+      version: "1.0.0",
     },
-    apis: ["./docs/swagger-docs.yaml"]
+    servers: [{
+      url: `https://newsaggregator-mern.onrender.com`
+    }]
+  },
+  apis: ["./docs/swagger-docs.yaml"]
 }
 
 
@@ -42,9 +42,9 @@ app.use("/v1/posts", postsRoutes)
 app.use("/v1/users", usersRoutes)
 
 mongoose.connect(connectionSTring, { dbName: process.env.MONGODB_DATABASE_NAME })
-    .then(() => {
-        console.log("Connected successfully to MongoDB");
-        app.listen(port, () => {console.log(`Listening on port ${port}`)});
-    })
-    .catch(err => console.log(err));
+  .then(() => {
+    console.log("Connected successfully to MongoDB");
+    app.listen(port, () => { console.log(`Listening on port ${port}`) });
+  })
+  .catch(err => console.log(err));
 

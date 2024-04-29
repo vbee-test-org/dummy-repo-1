@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 import Article from "../models/articles/ArticleModel.js";
-import ArticlePublisher from "../models/articles/ArticlePublisherModel.js";
 import { Redis } from "ioredis";
 
 /***********************************Get articles****************************************/
 const getArticles = async (req, res) => {
-  // Redis instance
-  const redis = new Redis(process.env.REDIS_URL);
   // Get last modified date and check if the request has been modified
   const ifModifiedSince = req.get("If-Modified-Since");
   if (ifModifiedSince) {
@@ -19,6 +16,8 @@ const getArticles = async (req, res) => {
       console.log(error.message);
     }
   }
+  // Redis instance
+  const redis = new Redis(process.env.REDIS_URL);
   // Get params
   const page = Number(req.query.page) || null;
   const limit = Number(req.query.limit) || null;
@@ -26,31 +25,28 @@ const getArticles = async (req, res) => {
   // Cache hit
   if (articlesCache) {
     console.log("Fetching articles from cache");
+    redis.quit();
     return res.status(200).json(JSON.parse(articlesCache));
   }
   // Cache miss
   try {
     console.log("Fetching articles from database");
+    // Pipeline
     const pipeline = [];
-
     pipeline.push({
       $match: {}
     });
-
     pipeline.push({
       $sort: { creation_date: -1 }
     });
-
     if (page !== null) {
       pipeline.push({
         $skip: (page - 1) * limit
       });
-
       pipeline.push({
         $limit: limit
       });
     }
-
     pipeline.push({
       $lookup: {
         from: "articles.publishers",
@@ -59,11 +55,9 @@ const getArticles = async (req, res) => {
         as: "publisher",
       }
     });
-
     pipeline.push({
       $unwind: "$publisher"
     });
-
     pipeline.push({
       $project: {
         _id: 0,
@@ -80,7 +74,6 @@ const getArticles = async (req, res) => {
         categories: 1,
       }
     });
-
     const articles = await Article.aggregate(pipeline);
     const count = await Article.countDocuments();
     // Setting cache
@@ -160,6 +153,7 @@ const updateArticle = async (req, res) => {
 /***********************************Search a specific article****************************************/
 const fulltextSearchArticles = async (req, res) => {
   try {
+    // Pipeline
     const pipeline = []
     pipeline.push({
       $search: {
@@ -172,8 +166,7 @@ const fulltextSearchArticles = async (req, res) => {
           fuzzy: {}
         },
       },
-    })
-
+    });
     pipeline.push({
       $lookup: {
         from: "articles.publishers",
@@ -181,12 +174,10 @@ const fulltextSearchArticles = async (req, res) => {
         foreignField: "ref_name",
         as: "publisher",
       }
-    })
-
+    });
     pipeline.push({
       $unwind: "$publisher"
-    })
-
+    });
     pipeline.push({
       $project: {
         _id: 0,
@@ -203,18 +194,18 @@ const fulltextSearchArticles = async (req, res) => {
         categories: 1,
         score: { $meta: "searchScore" },
       }
-    })
-
+    });
     const articles = await Article.aggregate(pipeline);
     res.status(200).json({ articles });
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
 }
 
 /***********************************Autocomplete search****************************************/
 const autocompleteArticleSearch = async (req, res) => {
   try {
+    // Pipeline
     const pipeline = []
     pipeline.push({
       $search: {
@@ -226,7 +217,6 @@ const autocompleteArticleSearch = async (req, res) => {
         },
       },
     })
-
     pipeline.push({
       $lookup: {
         from: "articles.publishers",
@@ -235,11 +225,9 @@ const autocompleteArticleSearch = async (req, res) => {
         as: "publisher",
       }
     })
-
     pipeline.push({
       $unwind: "$publisher"
     })
-
     pipeline.push({
       $project: {
         _id: 0,
@@ -258,7 +246,6 @@ const autocompleteArticleSearch = async (req, res) => {
         score: { $meta: "searchScore" },
       }
     })
-
     const result = await Article.aggregate(pipeline)
     res.status(200).json({ result });
   } catch (error) {
