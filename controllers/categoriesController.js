@@ -17,7 +17,7 @@ const getArticleCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for articles from database");
-    const categories = await ArticleCategory.find({ category: { $in: ["cryptocurrency", "press release", "blog", "news", "bitcoin"] } }).populate({
+    const categories = await ArticleCategory.find({ category: { $in: ["cryptocurrency", "press release", "ethereum", "news", "bitcoin"] } }).populate({
       path: "articles",
       options: {
         sort: { creation_date: -1 },
