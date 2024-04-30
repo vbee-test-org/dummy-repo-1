@@ -33,11 +33,11 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  upvotes: {
+  up_votes: {
     type: Number,
     required: true
   },
-  downvotes: {
+  down_votes: {
     type: Number,
     required: true
   },

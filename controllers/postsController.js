@@ -57,8 +57,8 @@ const getPosts = async (req, res) => {
         website_source: 1,
         post_content: 1,
         creation_date: 1,
-        upvotes: 1,
-        downvotes: 1,
+        up_votes: 1,
+        down_votes: 1,
         categories: 1
       }
     });
@@ -101,8 +101,8 @@ const fulltextSearchPosts = async (req, res) => {
         website_source: 1,
         post_content: 1,
         creation_date: 1,
-        upvotes: 1,
-        downvotes: 1,
+        up_votes: 1,
+        down_votes: 1,
         categories: 1,
         score: { $meta: "searchScore" },
       }
