@@ -17,13 +17,16 @@ const getArticleCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for articles from database");
-    const categories = await ArticleCategory.find({ category: { $in: ["cryptocurrency", "press release", "ethereum", "news", "bitcoin"] } }).populate({
-      path: "articles",
-      options: {
-        sort: { creation_date: -1 },
-        perDocumentLimit: 5
-      }
-    });
+    const categories = await ArticleCategory.find()
+      .sort({ articles_guid: -1 })
+      .limit(5)
+      .populate({
+        path: "articles",
+        options: {
+          sort: { creation_date: -1 },
+          perDocumentLimit: 5
+        }
+      });
     const count = categories.length;
     redis.set("article_categories_content", JSON.stringify({ count, categories }), "EX", 600);
     redis.quit();
@@ -61,13 +64,16 @@ const getPostCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for posts from database");
-    const categories = await PostCategory.find({ category: { $in: ["discussion", "advice", "analysis", "general", "comedy"] } }).populate({
-      path: "posts",
-      options: {
-        sort: { creation_date: -1 },
-        perDocumentLimit: 5
-      }
-    });
+    const categories = await PostCategory.find()
+      .sort({ posts_guid: -1 })
+      .limit(5)
+      .populate({
+        path: "posts",
+        options: {
+          sort: { creation_date: -1 },
+          perDocumentLimit: 5
+        }
+      });
     const count = categories.length;
     redis.set("post_categories_content", JSON.stringify({ count, categories }), "EX", 600);
     redis.quit();
