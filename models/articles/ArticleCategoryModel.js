@@ -14,7 +14,7 @@ const ArticleCategorySchema = new mongoose.Schema({
 ArticleCategorySchema.virtual("articles", {
   ref: 'Article',
   localField: "articles_guid",
-  foreignField: "guid"
+  foreignField: "guid",
 });
 
 const ArticleCategory = mongoose.model("ArticleCategory", ArticleCategorySchema, "articles.categories")
