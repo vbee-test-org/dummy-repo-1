@@ -144,7 +144,8 @@ const getPostCategories = async (req, res) => {
           post_content: post.post_content,
           categories: post.categories,
           up_votes: post.up_votes,
-          down_votes: post.down_votes
+          down_votes: post.down_votes,
+          media_url: post.media_url
         }))
       }))
     }
@@ -187,7 +188,8 @@ const searchPostCategories = async (req, res) => {
           post_content: post.post_content,
           categories: post.categories,
           up_votes: post.up_votes,
-          down_votes: post.down_votes
+          down_votes: post.down_votes,
+          media_url: post.media_url
         }))
       }))
     }

@@ -44,7 +44,10 @@ const PostSchema = new mongoose.Schema({
   categories: [{
     type: String,
     required: true
-  }]
+  }],
+  media_url: {
+    type: String
+  }
 });
 
 const Post = mongoose.model("Post", PostSchema, "posts");

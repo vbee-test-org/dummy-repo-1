@@ -59,7 +59,8 @@ const getPosts = async (req, res) => {
         creation_date: 1,
         up_votes: 1,
         down_votes: 1,
-        categories: 1
+        categories: 1,
+        media_url: 1
       }
     });
     const posts = await Post.aggregate(pipeline);
@@ -104,6 +105,7 @@ const fulltextSearchPosts = async (req, res) => {
         up_votes: 1,
         down_votes: 1,
         categories: 1,
+        media_url: 1,
         score: { $meta: "searchScore" },
       }
     });
