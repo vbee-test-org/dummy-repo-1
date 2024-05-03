@@ -3,6 +3,7 @@ import { articlesRoutes } from "./routes/articlesRoutes.js"
 import { usersRoutes } from "./routes/usersRoutes.js"
 import { categoriesRoutes } from "./routes/categoriesRoutes.js"
 import { postsRoutes } from "./routes/postsRoutes.js"
+import { coinsRoutes } from "./routes/coinsRoutes.js"
 import swaggerJSDoc from "swagger-jsdoc"
 import swaggerUI from "swagger-ui-express"
 import mongoose from "mongoose"
@@ -40,6 +41,7 @@ app.use("/v1/articles", articlesRoutes)
 app.use("/v1/categories", categoriesRoutes)
 app.use("/v1/posts", postsRoutes)
 app.use("/v1/users", usersRoutes)
+app.use("/v1/coins", coinsRoutes)
 
 mongoose.connect(connectionSTring, { dbName: process.env.MONGODB_DATABASE_NAME })
   .then(() => {

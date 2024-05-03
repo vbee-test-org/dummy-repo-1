@@ -3,7 +3,7 @@ import { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchAr
 
 const router = express.Router()
 
-// Get all articls route
+// Get all articles route
 router.get("/", getArticles);
 
 // Add new article route
