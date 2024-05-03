@@ -65,4 +65,4 @@ If you would like to contribute to the News Aggregator MERN project, please foll
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+This project is licensed under the GPL-3.0 License. See the [LICENSE](LICENSE) file for more information.
