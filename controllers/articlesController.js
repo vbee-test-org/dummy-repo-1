@@ -66,7 +66,10 @@ const getArticles = async (req, res) => {
         article_title: 1,
         article_link: 1,
         author: 1,
-        publisher: 1,
+        publisher: {
+          name: "$publisher.name",
+          logo: "$publisher.logo"
+        },
         article_summary: 1,
         article_detailed_content: 1,
         thumbnail_image: 1,
@@ -186,7 +189,10 @@ const fulltextSearchArticles = async (req, res) => {
         article_title: 1,
         article_link: 1,
         author: 1,
-        publisher: 1,
+        publisher: {
+          name: "$publisher.name",
+          logo: "$publisher.logo"
+        },
         article_summary: 1,
         article_detailed_content: 1,
         thumbnail_image: 1,
@@ -205,7 +211,6 @@ const fulltextSearchArticles = async (req, res) => {
 /***********************************Autocomplete search****************************************/
 const autocompleteArticleSearch = async (req, res) => {
   try {
-    // Pipeline
     const pipeline = []
     pipeline.push({
       $search: {
@@ -237,7 +242,10 @@ const autocompleteArticleSearch = async (req, res) => {
         article_link: 1,
         author: 1,
         website_source: 0,
-        publisher: 1,
+        publisher: {
+          name: "$publisher.name",
+          logo: "$publisher.logo"
+        },
         article_summary: 1,
         article_detailed_content: 1,
         thumbnail_image: 1,

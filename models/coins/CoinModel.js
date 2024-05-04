@@ -30,10 +30,10 @@ const CoinSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  prices: [{
+  prices: {
     date: { type: String, required: true },
     price: { type: Number, required: true }
-  }]
+  }
 });
 
 const Coin = mongoose.model("Coin", CoinSchema, "coins");
