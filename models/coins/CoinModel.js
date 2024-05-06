@@ -33,6 +33,10 @@ const CoinSchema = new mongoose.Schema({
   prices: {
     date: { type: String, required: true },
     price: { type: Number, required: true }
+  },
+  thumbnail_image: {
+    type: String,
+    required: true
   }
 });
 
