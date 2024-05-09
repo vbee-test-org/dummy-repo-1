@@ -63,7 +63,8 @@ const getArticleCategories = async (req, res) => {
 
 /***********************************Search article categories****************************************/
 const searchArticleCategories = async (req, res) => {
-  const { text, opt = "e" } = req.query;
+  const text = req.query.text;
+  const opt = req.query.opt || "e";
 
   if (!text) {
     return res.status(400).json({ error: "text must not be empty!" })
@@ -176,17 +177,18 @@ const getPostCategories = async (req, res) => {
 
 /***********************************Search post categories****************************************/
 const searchPostCategories = async (req, res) => {
-  const { text, opt = "exact" } = req.query;
+  const text = req.query.text;
+  const opt = req.query.opt || "e";
 
   if (!text) {
     return res.status(400).json({ error: "text must not be empty!" })
   }
 
   var searchTerm;
-  if (opt === "regex") {
+  if (opt === "r") {
     searchTerm = { $regex: `^${text}` };
   }
-  else if (opt === "exact") {
+  else if (opt === "e") {
     searchTerm = { $eq: text };
   }
   else {
