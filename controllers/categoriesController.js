@@ -17,7 +17,7 @@ const getArticleCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for articles from database");
-    const categories = await ArticleCategory.find({ "articles_guid.10": { $exists: true } })
+    const categories = await ArticleCategory.find({ "articles_guid.30": { $exists: true } })
       .limit(5)
       .populate({
         path: "articles",
@@ -63,12 +63,25 @@ const getArticleCategories = async (req, res) => {
 
 /***********************************Search article categories****************************************/
 const searchArticleCategories = async (req, res) => {
-  const text = req.query.text;
+  const { text, opt = "e" } = req.query;
+
   if (!text) {
     return res.status(400).json({ error: "text must not be empty!" })
   }
+
+  var searchTerm;
+  if (opt === "r") {
+    searchTerm = { $regex: `^${text}` };
+  }
+  else if (opt === "e") {
+    searchTerm = { $eq: text };
+  }
+  else {
+    return res.status(400).json({ error: "Undefined search term" })
+  }
+
   try {
-    const categories = await ArticleCategory.find({ category: { $regex: req.query.text } }).populate({
+    const categories = await ArticleCategory.find({ category: searchTerm }).populate({
       path: "articles",
       options: {
         sort: { creation_date: -1 },
@@ -83,7 +96,6 @@ const searchArticleCategories = async (req, res) => {
       categories: categories.map(category => ({
         category: category.category,
         articles: category.articles.map(article => ({
-          _id: article._id,
           guid: article.guid,
           article_link: article.article_link,
           type_: article.type_,
@@ -123,7 +135,7 @@ const getPostCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for posts from database");
-    const categories = await PostCategory.find({ "posts_guid.10": { $exists: true } })
+    const categories = await PostCategory.find({ "posts_guid.30": { $exists: true } })
       .limit(5)
       .populate({
         path: "posts",
@@ -164,12 +176,25 @@ const getPostCategories = async (req, res) => {
 
 /***********************************Search post categories****************************************/
 const searchPostCategories = async (req, res) => {
-  const text = req.query.text;
+  const { text, opt = "exact" } = req.query;
+
   if (!text) {
     return res.status(400).json({ error: "text must not be empty!" })
   }
+
+  var searchTerm;
+  if (opt === "regex") {
+    searchTerm = { $regex: `^${text}` };
+  }
+  else if (opt === "exact") {
+    searchTerm = { $eq: text };
+  }
+  else {
+    return res.status(400).json({ error: "Undefined search term" })
+  }
+
   try {
-    const categories = await PostCategory.find({ category: { $regex: req.query.text } }).populate({
+    const categories = await PostCategory.find({ category: searchTerm }).populate({
       path: "posts",
       options: {
         sort: { creation_date: -1 }
