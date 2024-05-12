@@ -35,9 +35,7 @@ const getArticleCategories = async (req, res) => {
       categories: categories.map(category => ({
         category: category.category,
         articles: category.articles.map(article => ({
-          guid: article.guid,
           article_link: article.article_link,
-          type_: article.type_,
           website_source: article.website_source,
           article_title: article.article_title,
           author: article.author,
@@ -97,9 +95,7 @@ const searchArticleCategories = async (req, res) => {
       categories: categories.map(category => ({
         category: category.category,
         articles: category.articles.map(article => ({
-          guid: article.guid,
           article_link: article.article_link,
-          type_: article.type_,
           website_source: article.website_source,
           article_title: article.article_title,
           author: article.author,
@@ -151,9 +147,7 @@ const getPostCategories = async (req, res) => {
       categories: categories.map(category => ({
         category: category.category,
         posts: category.posts.map(post => ({
-          guid: post.guid,
           post_link: post.post_link,
-          type_: post.type_,
           website_source: post.website_source,
           post_title: post.post_title,
           author: post.author,
@@ -208,9 +202,7 @@ const searchPostCategories = async (req, res) => {
       categories: categories.map(category => ({
         category: category.category,
         posts: category.posts.map(post => ({
-          guid: post.guid,
           post_link: post.post_link,
-          type_: post.type_,
           website_source: post.website_source,
           post_title: post.post_title,
           author: post.author,

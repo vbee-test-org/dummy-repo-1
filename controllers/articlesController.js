@@ -61,8 +61,6 @@ const getArticles = async (req, res) => {
     pipeline.push({
       $project: {
         _id: 0,
-        guid: 1,
-        type_: 1,
         article_title: 1,
         article_link: 1,
         author: 1,
@@ -184,8 +182,6 @@ const fulltextSearchArticles = async (req, res) => {
     pipeline.push({
       $project: {
         _id: 0,
-        guid: 1,
-        type_: 1,
         article_title: 1,
         article_link: 1,
         author: 1,
@@ -236,8 +232,6 @@ const autocompleteArticleSearch = async (req, res) => {
     pipeline.push({
       $project: {
         _id: 0,
-        guid: 1,
-        type_: 1,
         article_title: 1,
         article_link: 1,
         author: 1,
