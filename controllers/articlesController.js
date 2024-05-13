@@ -154,8 +154,8 @@ const updateArticle = async (req, res) => {
 /***********************************Search a specific article****************************************/
 const fulltextSearchArticles = async (req, res) => {
   // Get params
-  const page = Number(req.query.page) || null;
-  const limit = Number(req.query.limit) || null;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
   const text = req.query.text;
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
@@ -221,7 +221,7 @@ const fulltextSearchArticles = async (req, res) => {
     const results = await Article.aggregate(pipeline);
     const articles = results[0].articles;
     const count = results[0].metadata[0].totalResults;
-    redis.set(`articles_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }));
+    redis.set(`articles_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
     redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles });
   } catch (error) {

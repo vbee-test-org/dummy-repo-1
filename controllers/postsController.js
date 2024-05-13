@@ -20,12 +20,12 @@ const getPosts = async (req, res) => {
   // Get params
   const page = Number(req.query.page) || null;
   const limit = Number(req.query.limit) || null;
-  const articlesCache = await redis.get(`posts_content_${page}`);
+  const postsCache = await redis.get(`posts_content_${page}`);
   // Cache hit
-  if (articlesCache) {
+  if (postsCache) {
     console.log("Fetching posts from cache");
     redis.quit();
-    return res.status(200).json(JSON.parse(articlesCache));
+    return res.status(200).json(JSON.parse(postsCache));
   }
   // Cache miss
   try {
@@ -74,7 +74,22 @@ const getPosts = async (req, res) => {
 
 /***********************************Full text search posts****************************************/
 const fulltextSearchPosts = async (req, res) => {
+  // Get params
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const text = req.query.text;
+  // Redis instance
+  const redis = new Redis(process.env.REDIS_URL);
+  const searchCache = await redis.get(`posts_search_${text}_${page}`);
+  // Cache hit
+  if (searchCache) {
+    console.log("Fetching results from cache");
+    redis.quit();
+    return res.status(200).json(JSON.parse(searchCache));
+  }
+  // Cache miss
   try {
+    console.log("Fetching results from database");
     // Pipeline
     const pipeline = []
     pipeline.push({
@@ -105,8 +120,17 @@ const fulltextSearchPosts = async (req, res) => {
         score: { $meta: "searchScore" },
       }
     });
-    const posts = await Post.aggregate(pipeline);
-    res.status(200).json({ posts });
+    pipeline.push({
+      $facet: {
+        metadata: [{ $count: "totalResults" }],
+        posts: [{ $skip: (page - 1) * limit }, { $limit: limit }]
+      }
+    });
+    const results = await Post.aggregate(pipeline);
+    const posts = results[0].posts;
+    const count = results[0].metadata[0].totalResults;
+    redis.set(`posts_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
+    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
