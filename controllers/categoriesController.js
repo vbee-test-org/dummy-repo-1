@@ -17,8 +17,9 @@ const getArticleCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for articles from database");
-    const categories = await ArticleCategory.find({ "articles_guid.30": { $exists: true } })
-      .limit(5)
+    const categories = await ArticleCategory.find()
+      .sort({ articles_count: -1 })
+      .limit(10)
       .populate({
         path: "articles",
         options: {
@@ -36,7 +37,6 @@ const getArticleCategories = async (req, res) => {
         category: category.category,
         articles: category.articles.map(article => ({
           article_link: article.article_link,
-          website_source: article.website_source,
           article_title: article.article_title,
           author: article.author,
           creation_date: article.creation_date,
@@ -96,7 +96,6 @@ const searchArticleCategories = async (req, res) => {
         category: category.category,
         articles: category.articles.map(article => ({
           article_link: article.article_link,
-          website_source: article.website_source,
           article_title: article.article_title,
           author: article.author,
           creation_date: article.creation_date,
@@ -132,8 +131,9 @@ const getPostCategories = async (req, res) => {
   // Cache miss
   try {
     console.log("Fetching categories for posts from database");
-    const categories = await PostCategory.find({ "posts_guid.30": { $exists: true } })
-      .limit(5)
+    const categories = await PostCategory.find()
+      .sort({ posts_count: -1 })
+      .limit(10)
       .populate({
         path: "posts",
         options: {

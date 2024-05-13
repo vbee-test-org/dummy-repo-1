@@ -19,8 +19,8 @@ const getArticles = async (req, res) => {
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
   // Get params
-  const page = Number(req.query.page) || null;
-  const limit = Number(req.query.limit) || null;
+  const page = parseInt(req.query.page) || null;
+  const limit = parseInt(req.query.limit) || null;
   const articlesCache = await redis.get(`articles_content_${page}`);
   // Cache hit
   if (articlesCache) {

@@ -18,8 +18,8 @@ const getPosts = async (req, res) => {
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
   // Get params
-  const page = Number(req.query.page) || null;
-  const limit = Number(req.query.limit) || null;
+  const page = parseInt(req.query.page) || null;
+  const limit = parseInt(req.query.limit) || null;
   const postsCache = await redis.get(`posts_content_${page}`);
   // Cache hit
   if (postsCache) {
@@ -130,6 +130,7 @@ const fulltextSearchPosts = async (req, res) => {
     const posts = results[0].posts;
     const count = results[0].metadata[0].totalResults;
     redis.set(`posts_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
+    redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts });
   } catch (error) {
     res.status(500).json({ error: error.message })
