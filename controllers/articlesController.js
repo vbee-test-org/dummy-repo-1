@@ -222,6 +222,7 @@ const fulltextSearchArticles = async (req, res) => {
     const articles = results[0].articles;
     const count = results[0].metadata[0].totalResults;
     redis.set(`articles_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }));
+    redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles });
   } catch (error) {
     res.status(500).json({ error: error.message });
