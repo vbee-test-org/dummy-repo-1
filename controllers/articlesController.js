@@ -153,14 +153,29 @@ const updateArticle = async (req, res) => {
 
 /***********************************Search a specific article****************************************/
 const fulltextSearchArticles = async (req, res) => {
+  // Get params
+  const page = Number(req.query.page) || null;
+  const limit = Number(req.query.limit) || null;
+  const text = req.query.text;
+  // Redis instance
+  const redis = new Redis(process.env.REDIS_URL);
+  const searchCache = await redis.get(`articles_search_${text}_${page}`);
+  // Cache hit
+  if (searchCache) {
+    console.log("Fetching results from cache");
+    redis.quit();
+    return res.status(200).json(JSON.parse(searchCache));
+  }
+  // Cache miss
   try {
+    console.log("Fetching results from database");
     // Pipeline
     const pipeline = []
     pipeline.push({
       $search: {
         index: process.env.MONGODB_ARTICLE_SEARCH_INDEX_NAME,
         text: {
-          query: req.query.text,
+          query: text,
           path: {
             wildcard: "*"
           },
@@ -197,8 +212,17 @@ const fulltextSearchArticles = async (req, res) => {
         score: { $meta: "searchScore" },
       }
     });
-    const articles = await Article.aggregate(pipeline);
-    res.status(200).json({ articles });
+    pipeline.push({
+      $facet: {
+        metadata: [{ $count: "totalResults" }],
+        articles: [{ $skip: (page - 1) * limit }, { $limit: limit }]
+      }
+    })
+    const results = await Article.aggregate(pipeline);
+    const articles = results[0].articles;
+    const count = results[0].metadata[0].totalResults;
+    redis.set(`articles_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }));
+    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
