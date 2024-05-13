@@ -271,7 +271,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/posts/search?text={text}&sort={sortOrder}:
+  /v1/posts/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
     get:
       description: 'Full-text search'
       tags:
@@ -289,6 +289,18 @@ paths:
         required: true
         schema:
           type: 'string'
+      - name: 'page'
+        in: 'path'
+        description: 'The page number'
+        required: true
+        schema:
+          type: 'integer'
+      - name: 'limit'
+        in: 'path'
+        description: 'The number of posts per page'
+        required: true
+        schema:
+          type: 'integer'
       responses:
         200:
           description: 'Show the result'
@@ -297,7 +309,7 @@ paths:
 
   /v1/categories/articles:
     get:
-      description: 'Get all categories for articles'
+      description: 'Get 10 most categories for articles'
       tags:
       - 'Categories'
       responses:
@@ -330,7 +342,7 @@ paths:
 
   /v1/categories/posts:
     get:
-      description: 'Get all categories for posts'
+      description: 'Get 10 most popular categories for posts'
       tags:
       - 'Categories'
       responses:
