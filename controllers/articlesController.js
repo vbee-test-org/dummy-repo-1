@@ -19,8 +19,8 @@ const getArticles = async (req, res) => {
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
   // Get params
-  const page = parseInt(req.query.page) || null;
-  const limit = parseInt(req.query.limit) || null;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 30;
   const articlesCache = await redis.get(`articles_content_${page}`);
   // Cache hit
   if (articlesCache) {
@@ -154,8 +154,8 @@ const updateArticle = async (req, res) => {
 /***********************************Search a specific article****************************************/
 const fulltextSearchArticles = async (req, res) => {
   // Get params
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 30;
   const text = req.query.text;
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);

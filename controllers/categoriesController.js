@@ -24,7 +24,7 @@ const getArticleCategories = async (req, res) => {
         path: "articles",
         options: {
           sort: { creation_date: -1 },
-          perDocumentLimit: 10,
+          perDocumentLimit: 30,
           populate: {
             path: "publisher",
           }
@@ -61,6 +61,9 @@ const getArticleCategories = async (req, res) => {
 
 /***********************************Search article categories****************************************/
 const searchArticleCategories = async (req, res) => {
+  // Get params
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 30;
   const text = req.query.text;
   const opt = req.query.opt || "e";
 
@@ -68,31 +71,53 @@ const searchArticleCategories = async (req, res) => {
     return res.status(400).json({ error: "text must not be empty!" })
   }
 
-  var searchTerm;
-  if (opt === "r") {
-    searchTerm = { $regex: `^${text}` };
+  // Redis instance
+  const redis = new Redis(process.env.REDIS_URL);
+  const searchCache = await redis.get(`articles_${text}_${opt}_${page}`);
+  // Cache hit
+  if (searchCache) {
+    console.log("Fetching results from cache");
+    redis.quit();
+    return res.status(200).json(JSON.parse(searchCache));
   }
-  else if (opt === "e") {
-    searchTerm = { $eq: text };
-  }
-  else {
-    return res.status(400).json({ error: "Undefined search term" })
-  }
-
+  // Cache miss
   try {
-    const categories = await ArticleCategory.find({ category: searchTerm }).populate({
-      path: "articles",
-      options: {
-        sort: { creation_date: -1 },
-        populate: {
-          path: "publisher"
-        }
-      }
-    });
-    const count = categories.length;
-    const reduced_categories = {
-      count,
-      categories: categories.map(category => ({
+    var results;
+    if (opt === "r") {
+      results = await ArticleCategory.find({ category: { $regex: `^${text}` } })
+        .populate({
+          path: "articles",
+          options: {
+            sort: { creation_date: -1 },
+            perDocumentLimit: 30,
+            populate: {
+              path: "publisher"
+            }
+          }
+        });
+    }
+    else if (opt === "e") {
+      results = await ArticleCategory.find({ category: { $eq: text } })
+        .populate({
+          path: "articles",
+          options: {
+            sort: { creation_date: -1 },
+            populate: {
+              path: "publisher"
+            },
+            skip: (page - 1) * limit,
+            limit: limit
+          }
+        });
+    }
+    else {
+      return res.status(400).json({ error: "Undefined search term" })
+    }
+    const count = results.reduce((acc, current) => {
+      acc + current.articles_count
+    }, 0);
+    const categories = {
+      categories: results.map(category => ({
         category: category.category,
         articles: category.articles.map(article => ({
           article_link: article.article_link,
@@ -111,7 +136,9 @@ const searchArticleCategories = async (req, res) => {
       }))
     }
 
-    res.status(200).json(reduced_categories);
+    redis.set(`articles_${text}_${opt}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, categories }), "EX", 600);
+    redis.quit();
+    res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, categories });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
