@@ -98,6 +98,29 @@ components:
         upvotes: 84
         downvotes: 0
         categories: ['foo', 'bar']
+    Coin:
+      type: 'object'
+      properties:
+        rank:
+          type: 'number'
+        btc_price:
+          type: 'number'
+        prices:
+          type: 'array'
+          items:
+            date:
+              type: 'string'
+            price:
+              type: 'number'
+        thumbnail_image:
+          type: 'string'
+      example:
+        rank: 1
+        btc_price: 1
+        prices:
+          "2024-05-14T20:27:00Z" : '61618.47'
+        thumbnail_image: "https://assets.coincap.io/assets/icons/btc@2x.png"
+      
 
 paths:
   /v1/articles?page={page}&limit={limit}:
@@ -306,7 +329,28 @@ paths:
           description: 'Show the result'
         500:
           description: 'Show error message'
-
+  /v1/coins?limit={limit}:
+    get:
+      description: 'Get {limit} coins'
+      tags:
+      - 'Coins'
+      responses:
+        200:
+          description: 'Show the number of avaliable coins and and array of coins'
+        500:
+          description: 'Show error message'
+  /v1/coins/{symbol}:
+    get:
+      description: 'Get info of a specific coin by symbol'
+      tags:
+      - 'Coins'
+      responses:
+        200:
+          description: "Show the coin's info"
+        500:
+          description: 'Show error message'
+        400:
+          description: 'Coin symbol must not be null/undefined'
   /v1/categories/articles:
     get:
       description: 'Get 10 most categories for articles'
