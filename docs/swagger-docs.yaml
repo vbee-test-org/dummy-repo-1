@@ -334,6 +334,13 @@ paths:
       description: 'Get {limit} coins'
       tags:
       - 'Coins'
+      parameters:
+      - name: 'limit'
+        in: 'path'
+        description: 'The number of coins the client want to show. Default is 20'
+        required: false
+        schema:
+          type: 'string'
       responses:
         200:
           description: 'Show the number of avaliable coins and and array of coins'
@@ -344,6 +351,13 @@ paths:
       description: 'Get info of a specific coin by symbol'
       tags:
       - 'Coins'
+      parameters:
+        - name: 'symbol'
+          in: 'path'
+          description: 'The symbol of a specific coin'
+          required: true
+          schema:
+            type: 'string'
       responses:
         200:
           description: "Show the coin's info"
