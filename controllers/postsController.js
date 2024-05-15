@@ -126,7 +126,7 @@ const fulltextSearchPosts = async (req, res) => {
         posts: [{ $skip: (page - 1) * limit }, { $limit: limit }]
       }
     });
-    const results = await Post.aggregate(pipeline, { readConcern: { level: "majority" } });
+    const results = await Post.aggregate(pipeline);
     const posts = results[0].posts;
     const count = results[0].metadata[0].totalResults;
     redis.set(`posts_search_${text}_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
