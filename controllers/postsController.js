@@ -20,7 +20,7 @@ const getPosts = async (req, res) => {
   // Get params
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 30;
-  const postsCache = await redis.get(`posts_content_${page}`);
+  const postsCache = await redis.get(`posts_content_${page}_${limit}`);
   // Cache hit
   if (postsCache) {
     console.log("Fetching posts from cache");
@@ -61,10 +61,10 @@ const getPosts = async (req, res) => {
         media_url: 1
       }
     });
-    const posts = await Post.aggregate(pipeline);
-    const count = await Post.countDocuments();
+    const posts = await Post.aggregate(pipeline, { readConcern: { level: "majority" } });
+    const count = await Post.estimatedDocumentCount();
     // Setting cache
-    redis.set(`posts_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
+    redis.set(`posts_content_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
     redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts });
   } catch (error) {
@@ -80,7 +80,7 @@ const fulltextSearchPosts = async (req, res) => {
   const text = req.query.text;
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
-  const searchCache = await redis.get(`posts_search_${text}_${page}`);
+  const searchCache = await redis.get(`posts_search_${text}_${page}_${limit}`);
   // Cache hit
   if (searchCache) {
     console.log("Fetching results from cache");
@@ -126,10 +126,10 @@ const fulltextSearchPosts = async (req, res) => {
         posts: [{ $skip: (page - 1) * limit }, { $limit: limit }]
       }
     });
-    const results = await Post.aggregate(pipeline);
+    const results = await Post.aggregate(pipeline, { readConcern: { level: "majority" } });
     const posts = results[0].posts;
     const count = results[0].metadata[0].totalResults;
-    redis.set(`posts_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
+    redis.set(`posts_search_${text}_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
     redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts });
   } catch (error) {

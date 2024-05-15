@@ -72,7 +72,7 @@ const searchArticleCategories = async (req, res) => {
   }
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
-  const searchCache = await redis.get(`articles_${text}_${opt}_${page}`);
+  const searchCache = await redis.get(`articles_${text}_${opt}_${page}_${limit}`);
   // Cache hit
   if (searchCache) {
     console.log("Fetching results from cache");
@@ -83,7 +83,7 @@ const searchArticleCategories = async (req, res) => {
   try {
     var searchTerm, physicalPage, results, count;
     if (opt === "r") {
-      searchTerm = {$regex: `^${text}`}
+      searchTerm = { $regex: `^${text}` }
       physicalPage = null;
       results = await ArticleCategory.find({ category: searchTerm })
         .populate({
@@ -96,10 +96,10 @@ const searchArticleCategories = async (req, res) => {
             }
           }
         });
-      count = results.length*10;
+      count = results.length * 10;
     }
     else if (opt === "e") {
-      searchTerm = {$eq: text};
+      searchTerm = { $eq: text };
       physicalPage = page;
       results = await ArticleCategory.find({ category: searchTerm })
         .populate({
@@ -114,8 +114,8 @@ const searchArticleCategories = async (req, res) => {
           }
         });
       const articlesCount = await ArticleCategory.aggregate([
-        {$match: {category: searchTerm}},
-        {$project: {_id: 0, count: { $size: "$articles_guid"}}}
+        { $match: { category: searchTerm } },
+        { $project: { _id: 0, count: { $size: "$articles_guid" } } }
       ]);
       count = articlesCount[0].count;
     }
@@ -140,9 +140,9 @@ const searchArticleCategories = async (req, res) => {
       }))
     }));
 
-    redis.set(`articles_${text}_${opt}_${physicalPage}`, JSON.stringify({ count, totalPages: opt === "r"? 1: Math.ceil(count / limit), currentPage: physicalPage, categories }), "EX", 600);
+    redis.set(`articles_${text}_${opt}_${physicalPage}_${limit}`, JSON.stringify({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories }), "EX", 600);
     redis.quit();
-    res.status(200).json({ count, totalPages: opt === "r"? 1: Math.ceil(count / limit), currentPage: page, categories });
+    res.status(200).json({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: page, categories });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
@@ -213,7 +213,7 @@ const searchPostCategories = async (req, res) => {
   }
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
-  const searchCache = await redis.get(`posts_${text}_${opt}_${page}`);
+  const searchCache = await redis.get(`posts_${text}_${opt}_${page}_${limit}`);
   // Cache hit
   if (searchCache) {
     console.log("Fetching results from cache");
@@ -224,7 +224,7 @@ const searchPostCategories = async (req, res) => {
   try {
     var searchTerm, physicalPage, results, count;
     if (opt === "r") {
-      searchTerm = {$regex: `^${text}`}
+      searchTerm = { $regex: `^${text}` }
       physicalPage = null;
       results = await PostCategory.find({ category: searchTerm }).populate({
         path: "posts",
@@ -233,10 +233,10 @@ const searchPostCategories = async (req, res) => {
           perDocumentLimit: 10,
         }
       });
-      count = results.length*10;
+      count = results.length * 10;
     }
     else if (opt === "e") {
-      searchTerm = {$eq: text};
+      searchTerm = { $eq: text };
       physicalPage = page;
       results = await PostCategory.find({ category: searchTerm }).populate({
         path: "posts",
@@ -247,8 +247,8 @@ const searchPostCategories = async (req, res) => {
         }
       });
       const postsCount = await PostCategory.aggregate([
-        {$match: {category: searchTerm}},
-        {$project: {_id: 0, count: { $size: "$posts_guid"}}}
+        { $match: { category: searchTerm } },
+        { $project: { _id: 0, count: { $size: "$posts_guid" } } }
       ]);
       count = postsCount[0].count;
     }
@@ -271,9 +271,9 @@ const searchPostCategories = async (req, res) => {
       }))
     }));
 
-    redis.set(`posts_${text}_${opt}_${page}`, JSON.stringify({count, totalPages: opt === "r"? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories}), "EX", 600);
+    redis.set(`posts_${text}_${opt}_${page}_${limit}`, JSON.stringify({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories }), "EX", 600);
     redis.quit();
-    res.status(200).json({count, totalPages: opt === "r"? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories});
+    res.status(200).json({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

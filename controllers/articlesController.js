@@ -21,7 +21,7 @@ const getArticles = async (req, res) => {
   // Get params
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 30;
-  const articlesCache = await redis.get(`articles_content_${page}`);
+  const articlesCache = await redis.get(`articles_content_${page}_${limit}`);
   // Cache hit
   if (articlesCache) {
     console.log("Fetching articles from cache");
@@ -75,10 +75,10 @@ const getArticles = async (req, res) => {
         categories: 1,
       }
     });
-    const articles = await Article.aggregate(pipeline);
-    const count = await Article.countDocuments();
+    const articles = await Article.aggregate(pipeline, { readConcern: { level: "majority" } });
+    const count = await Article.estimatedDocumentCount();
     // Setting cache
-    redis.set(`articles_content_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
+    redis.set(`articles_content_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
     redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles });
   } catch (error) {
@@ -159,7 +159,7 @@ const fulltextSearchArticles = async (req, res) => {
   const text = req.query.text;
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
-  const searchCache = await redis.get(`articles_search_${text}_${page}`);
+  const searchCache = await redis.get(`articles_search_${text}_${page}_${limit}`);
   // Cache hit
   if (searchCache) {
     console.log("Fetching results from cache");
@@ -218,10 +218,10 @@ const fulltextSearchArticles = async (req, res) => {
         articles: [{ $skip: (page - 1) * limit }, { $limit: limit }]
       }
     })
-    const results = await Article.aggregate(pipeline);
+    const results = await Article.aggregate(pipeline, { readConcern: { level: "majority" } });
     const articles = results[0].articles;
     const count = results[0].metadata[0].totalResults;
-    redis.set(`articles_search_${text}_${page}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
+    redis.set(`articles_search_${text}_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);
     redis.quit();
     res.status(200).json({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles });
   } catch (error) {
