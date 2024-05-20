@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", getPosts);
 
 // Full text search posts
-router.get("/:text", fulltextSearchPosts);
+router.get("/search/:text", fulltextSearchPosts);
 
 // Get all posts categories
 router.get("/categories", getPostCategories);

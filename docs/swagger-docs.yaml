@@ -147,7 +147,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /api/v1/articles/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
+  /api/v1/articles/search/{text}?sort={sortOrder}&page={page}&limit={limit}:
     get:
       description: 'Full-text search'
       tags:
@@ -267,7 +267,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /api/v1/reddit/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
+  /api/v1/reddit/search/{text}&sort={sortOrder}&page={page}&limit={limit}:
     get:
       description: 'Full-text search'
       tags:

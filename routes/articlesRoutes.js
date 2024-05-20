@@ -7,7 +7,7 @@ const router = express.Router()
 router.get("/", getArticles);
 
 // Search for articles
-router.get("/:text", fulltextSearchArticles);
+router.get("/search/:text", fulltextSearchArticles);
 
 // Autocomplete search
 router.get("/autocomplete/:text", autocompleteArticleSearch);
