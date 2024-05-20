@@ -10,9 +10,9 @@ router.get('/articles', getArticleCategories);
 router.get('/articles/search', searchArticleCategories);
 
 // Get all posts categories route
-router.get('/posts', getPostCategories);
+router.get('/reddit', getPostCategories);
 
 // Find a category for posts route
-router.get('/posts/search', searchPostCategories);
+router.get('/reddit/search', searchPostCategories);
 
 export { router as categoriesRoutes };

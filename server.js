@@ -39,7 +39,7 @@ const swaggerSpec = {
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(swaggerSpec)))
 app.use("/v1/articles", articlesRoutes)
 app.use("/v1/categories", categoriesRoutes)
-app.use("/v1/posts", postsRoutes)
+app.use("/v1/reddit", postsRoutes)
 app.use("/v1/users", usersRoutes)
 app.use("/v1/coins", coinsRoutes)
 

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Article from "../models/articles/ArticleModel.js";
+import ArticleCategory from "../models/articles/ArticleCategoryModel.js";
 import { Redis } from "ioredis";
 
 /***********************************Get articles****************************************/
@@ -86,71 +87,6 @@ const getArticles = async (req, res) => {
   }
 }
 
-/***********************************Create an article****************************************/
-const addArticle = async (req, res) => {
-
-  // Grab the data from request body
-  const { guid, article_link, website_source, article_title, author, article_type, article_summary, article_detailed_content, creation_date, thumbnail_image, categories } = req.body;
-
-  // Check the fields are not empty
-  if (!guid || !article_title || !article_summary || !creation_date || !article_link || !website_source || !author || !article_type || !article_detailed_content || !thumbnail_image || !categories) {
-    return res.status(400).json({ error: "All fields are required!!!" })
-  }
-
-  try {
-    const article = await Article.create({ guid, article_link, website_source, article_title, author, article_type, article_summary, article_detailed_content, creation_date, thumbnail_image, categories });
-    res.status(200).json({ msg: "Article created", article });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-/***********************************Delete an article****************************************/
-const deleteArticle = async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({ error: "Incorrect id" });
-  }
-  const article = await Article.findById(req.params.id)
-  if (!article) {
-    return res.status(404).json({ error: "Article not found" });
-  }
-  try {
-    await article.deleteOne();
-    res.status(200).json({ success: "Article was deleted" })
-  } catch (error) {
-    res.status(500).json({ error: error.message })
-  }
-
-}
-
-/***********************************Update an article****************************************/
-const updateArticle = async (req, res) => {
-  // Request body
-  const { guid, article_link, website_source, article_title, author, article_type, article_summary, article_detailed_content, creation_date, thumbnail_image, categories } = req.body;
-  if (!guid || !article_title || !article_summary || !creation_date || !article_link || !website_source || !author || !article_type || !article_detailed_content || !thumbnail_image || !categories) {
-    return res.status(400).json({ error: "All fields are required!!!" })
-  }
-
-  // Check for valid ID
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({ error: "Incorrect id" });
-  }
-
-  // Check if article exists
-  const article = await Article.findById(req.params.id)
-  if (!article) {
-    return res.status(404).json({ error: "Article not found" });
-  }
-
-  try {
-    await article.updateOne({ guid, article_link, website_source, article_title, author, article_type, article_summary, article_detailed_content, creation_date, thumbnail_image });
-    res.status(200).json({ success: "Article was updated" })
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-
-}
-
 /***********************************Search a specific article****************************************/
 const fulltextSearchArticles = async (req, res) => {
   // Get params
@@ -176,9 +112,7 @@ const fulltextSearchArticles = async (req, res) => {
         index: process.env.MONGODB_ARTICLE_SEARCH_INDEX_NAME,
         text: {
           query: text,
-          path: {
-            wildcard: "*"
-          },
+          path: ["article_title", "article_summary"],
           fuzzy: {}
         },
       },
@@ -279,6 +213,150 @@ const autocompleteArticleSearch = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
-//TODO: Add get request for specific news source
 
-export { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchArticles, autocompleteArticleSearch }  
+/***********************************Get article categories****************************************/
+const getArticleCategories = async (req, res) => {
+  // Redis instance
+  const redis = new Redis(process.env.REDIS_URL);
+  const categoriesCache = await redis.get("article_categories_content");
+  // Cache hit
+  if (categoriesCache) {
+    console.log("Fetching categories for articles from cache");
+    redis.quit();
+    return res.status(200).json(JSON.parse(categoriesCache));
+  }
+  // Cache miss
+  try {
+    console.log("Fetching categories for articles from database");
+    const categories = await ArticleCategory.find()
+      .sort({ articles_count: -1 })
+      .limit(10)
+      .populate({
+        path: "articles",
+        options: {
+          sort: { creation_date: -1 },
+          perDocumentLimit: 10,
+          populate: {
+            path: "publisher",
+          }
+        }
+      });
+    const count = categories.length;
+    const reduced_categories = {
+      count,
+      categories: categories.map(category => ({
+        category: category.category,
+        articles: category.articles.map(article => ({
+          article_link: article.article_link,
+          article_title: article.article_title,
+          author: article.author,
+          creation_date: article.creation_date,
+          thumbnail_image: article.thumbnail_image,
+          article_summary: article.article_summary,
+          article_detailed_content: article.article_detailed_content,
+          categories: article.categories,
+          publisher: {
+            name: article.publisher?.[0]?.name || "",
+            logo: article.publisher?.[0]?.logo || ""
+          }
+        }))
+      }))
+    }
+    redis.set("article_categories_content", JSON.stringify(reduced_categories), "EX", 600);
+    redis.quit();
+    res.status(200).json(reduced_categories);
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+/***********************************Search article categories****************************************/
+const searchArticleCategories = async (req, res) => {
+  // Get params
+  const text = req.params.text;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 30;
+  const opt = req.query.opt || "e";
+
+  if (!text) {
+    return res.status(400).json({ error: "Search term must not be empty!" })
+  }
+  // Redis instance
+  const redis = new Redis(process.env.REDIS_URL);
+  const searchCache = await redis.get(`articles_${text}_${opt}_${page}_${limit}`);
+  // Cache hit
+  if (searchCache) {
+    console.log("Fetching results from cache");
+    redis.quit();
+    return res.status(200).json(JSON.parse(searchCache));
+  }
+  // Cache miss
+  try {
+    var searchTerm, physicalPage, results, count;
+    if (opt === "r") {
+      searchTerm = { $regex: `^${text}` }
+      physicalPage = null;
+      results = await ArticleCategory.find({ category: searchTerm })
+        .populate({
+          path: "articles",
+          options: {
+            sort: { creation_date: -1 },
+            perDocumentLimit: 10,
+            populate: {
+              path: "publisher"
+            }
+          }
+        });
+      count = results.length * 10;
+    }
+    else if (opt === "e") {
+      searchTerm = { $eq: text };
+      physicalPage = page;
+      results = await ArticleCategory.find({ category: searchTerm })
+        .populate({
+          path: "articles",
+          options: {
+            sort: { creation_date: -1 },
+            populate: {
+              path: "publisher"
+            },
+            skip: (page - 1) * limit,
+            limit: limit
+          }
+        });
+      const articlesCount = await ArticleCategory.aggregate([
+        { $match: { category: searchTerm } },
+        { $project: { _id: 0, count: { $size: "$articles_guid" } } }
+      ]);
+      count = articlesCount[0].count;
+    }
+    else {
+      return res.status(400).json({ error: "Undefined search term" })
+    }
+    const categories = results.map(category => ({
+      category: category.category,
+      articles: category.articles.map(article => ({
+        article_link: article.article_link,
+        article_title: article.article_title,
+        author: article.author,
+        creation_date: article.creation_date,
+        thumbnail_image: article.thumbnail_image,
+        article_summary: article.article_summary,
+        article_detailed_content: article.article_detailed_content,
+        categories: article.categories,
+        publisher: {
+          name: article.publisher?.[0]?.name || "",
+          logo: article.publisher?.[0]?.logo || ""
+        }
+      }))
+    }));
+
+    redis.set(`articles_${text}_${opt}_${physicalPage}_${limit}`, JSON.stringify({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories }), "EX", 600);
+    redis.quit();
+    res.status(200).json({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: page, categories });
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export { getArticles, fulltextSearchArticles, autocompleteArticleSearch, getArticleCategories, searchArticleCategories }  

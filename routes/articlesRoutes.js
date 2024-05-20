@@ -1,24 +1,21 @@
 import express from "express"
-import { getArticles, addArticle, deleteArticle, updateArticle, fulltextSearchArticles, autocompleteArticleSearch } from "../controllers/articlesController.js"
+import { getArticles, fulltextSearchArticles, autocompleteArticleSearch, getArticleCategories, searchArticleCategories } from "../controllers/articlesController.js"
 
 const router = express.Router()
 
 // Get all articles route
 router.get("/", getArticles);
 
-// Add new article route
-router.post("/", addArticle);
-
-// Delete an article
-router.delete("/:id", deleteArticle);
-
-// Update an article
-router.put("/:id", updateArticle);
-
 // Search for articles
 router.get("/search", fulltextSearchArticles);
 
 // Autocomplete search
 router.get("/autocomplete", autocompleteArticleSearch);
+
+// Get all for articles categories
+router.get("/categories", getArticleCategories);
+
+// Search for articles categories
+router.get("/categories/:text", searchArticleCategories);
 
 export { router as articlesRoutes }
