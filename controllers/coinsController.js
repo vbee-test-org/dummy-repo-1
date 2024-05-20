@@ -2,7 +2,8 @@ import Coin from "../models/coins/CoinModel.js";
 
 /***********************************Get coins****************************************/
 const getCoins = async (req, res) => {
-  const limit = req.query.limit || 20;
+  const limit = Number(req.query.limit) || 20;
+  const period = Number(req.query.period) || 30;
   try {
     const coins = await Coin.find({}, { _id: 0, symbol: 1, name: 1, market_cap: 1, rank: 1, btc_price: 1, prices: 1, thumbnail_image: 1 }).sort({ rank: 1 }).limit(limit);
     const count = coins.length

@@ -213,7 +213,7 @@ const searchPostCategories = async (req, res) => {
     var searchTerm, physicalPage, results, count;
     if (opt === "r") {
       searchTerm = { $regex: `^${text}` }
-      physicalPage = null;
+      physicalPage = 1;
       results = await PostCategory.find({ category: searchTerm }).populate({
         path: "posts",
         options: {

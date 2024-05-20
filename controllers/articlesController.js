@@ -275,7 +275,7 @@ const searchArticleCategories = async (req, res) => {
     var searchTerm, physicalPage, results, count;
     if (opt === "r") {
       searchTerm = { $regex: `^${text}` }
-      physicalPage = null;
+      physicalPage = 1;
       results = await ArticleCategory.find({ category: searchTerm })
         .populate({
           path: "articles",
@@ -333,7 +333,7 @@ const searchArticleCategories = async (req, res) => {
 
     redis.set(`articles_${text}_${opt}_${physicalPage}_${limit}`, JSON.stringify({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories }), "EX", 600);
     redis.quit();
-    res.status(200).json({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: page, categories });
+    res.status(200).json({ count, totalPages: opt === "r" ? 1 : Math.ceil(count / limit), currentPage: physicalPage, categories });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
