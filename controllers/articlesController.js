@@ -175,7 +175,7 @@ const autocompleteArticleSearch = async (req, res) => {
           tokenOrder: "sequential",
         },
       },
-    })
+    });
     pipeline.push({
       $lookup: {
         from: "articles.publishers",
@@ -183,10 +183,10 @@ const autocompleteArticleSearch = async (req, res) => {
         foreignField: "ref_name",
         as: "publisher",
       }
-    })
+    });
     pipeline.push({
       $unwind: "$publisher"
-    })
+    });
     pipeline.push({
       $project: {
         _id: 0,
@@ -205,7 +205,10 @@ const autocompleteArticleSearch = async (req, res) => {
         categories: 1,
         score: { $meta: "searchScore" },
       }
-    })
+    });
+    pipeline.push({
+      $limit: 10
+    });
     const result = await Article.aggregate(pipeline)
     res.status(200).json({ result });
   } catch (error) {
