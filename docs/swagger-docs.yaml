@@ -146,76 +146,6 @@ paths:
           description: 'Show the number of avaliable articles and an array of articles'
         500:
           description: 'Show error message'
-  
-  /v1/articles:
-    post:
-      description: 'Create an article'
-      tags:
-      - 'Articles'
-      requestBody:
-        description: 'Create an article'
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Article'
-      responses:
-        400:
-          description: 'All fields are required!!!'
-        200:
-          description: 'Article created'
-        500:
-          description: 'Show error message'
-
-  /v1/articles/{id}:
-    delete:
-      description: 'Delete an article'
-      tags:
-      - 'Articles'
-      parameters:
-      - name: 'id'
-        in: 'path'
-        description: 'ID of the article that you want to delete'
-        required: true
-        schema:
-          type: 'string'
-      responses:
-        200:
-          description: 'Article was deleted'
-        400:
-          description: 'Incorrect id'
-        404:
-          description: 'Article not found'
-        500:
-          description: 'Show error message'
-    
-    put:
-      description: 'Update an article'
-      tags:
-      - 'Articles'
-      parameters:
-      - name: 'id'
-        in: 'path'
-        description: 'ID of the article that you want to delete'
-        required: true
-        schema:
-          type: 'string'
-      requestBody:
-        description: 'Update an existing article'
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Article'
-      responses:
-        200:
-          description: 'Article was updated'
-        400:
-          description: '[ All fields required, Incorrect id ]'
-        404:
-          description: 'Article not found'
-        500:
-          description: 'Show error message'
 
   /v1/articles/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
     get:
@@ -264,13 +194,56 @@ paths:
         in: 'path'
         description: 'The term you want to search'
         required: true
+        schema:
+          type: 'string'
+      responses:
+        200:
+          description: 'Show the result'
+        500:
+          description: 'Show error message'
+
+  /v1/articles/categories?page={page}&limit={limit}:
+    get:
+      description: 'Get some popular categories'
+      tags:
+      - 'Articles'
     responses:
       200:
-        description: 'Show the result'
+        description: 'Show result'
       500:
         description: 'Show error message'
+    
+  /v1/articles/categories/{text}?page={page}&limit={limit}:
+    get:
+      description: 'Get some popular categories'
+      tags:
+      - 'Articles'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The term you want to search'
+        required: true
+        schema:
+          type: 'string'
+      - name: 'page'
+        in: 'path'
+        description: 'The page number'
+        required: true
+        schema:
+          type: 'integer'
+      - name: 'limit'
+        in: 'path'
+        description: 'The number of articles per page'
+        required: true
+        schema:
+          type: 'integer'
+      responses:
+        200:
+          description: 'Show the result'
+        500:
+          description: 'Show error message'
 
-  /v1/posts?page={page}&limit={limit}:
+  /v1/reddit?page={page}&limit={limit}:
     get:
       description: 'Get all posts'
       tags:
@@ -294,7 +267,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/posts/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
+  /v1/reddit/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
     get:
       description: 'Full-text search'
       tags:
@@ -329,6 +302,48 @@ paths:
           description: 'Show the result'
         500:
           description: 'Show error message'
+
+  /v1/reddit/categories?page={page}&limit={limit}:
+    get:
+      description: 'Get some popular categories'
+      tags:
+      - 'Posts'
+    responses:
+      200:
+        description: 'Show result'
+      500:
+        description: 'Show error message'
+    
+  /v1/reddit/categories/{text}?page={page}&limit={limit}:
+    get:
+      description: 'Get some popular categories'
+      tags:
+      - 'Posts'
+      parameters:
+      - name: 'text'
+        in: 'path'
+        description: 'The term you want to search'
+        required: true
+        schema:
+          type: 'string'
+      - name: 'page'
+        in: 'path'
+        description: 'The page number'
+        required: true
+        schema:
+          type: 'integer'
+      - name: 'limit'
+        in: 'path'
+        description: 'The number of articles per page'
+        required: true
+        schema:
+          type: 'integer'
+      responses:
+        200:
+          description: 'Show the result'
+        500:
+          description: 'Show error message'
+
   /v1/coins?limit={limit}:
     get:
       description: 'Get {limit} coins'
