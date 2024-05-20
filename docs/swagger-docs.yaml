@@ -123,7 +123,7 @@ components:
       
 
 paths:
-  /v1/articles?page={page}&limit={limit}:
+  /api/v1/articles?page={page}&limit={limit}:
     get:
       description: 'Get all articles'
       tags:
@@ -147,7 +147,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/articles/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
+  /api/v1/articles/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
     get:
       description: 'Full-text search'
       tags:
@@ -184,7 +184,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/articles/autocomplete:
+  /api/v1/articles/autocomplete?text={text}:
     get:
       description: 'Autocomplete search'
       tags:
@@ -202,7 +202,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/articles/categories?page={page}&limit={limit}:
+  /api/v1/articles/categories:
     get:
       description: 'Get some popular categories'
       tags:
@@ -213,7 +213,7 @@ paths:
       500:
         description: 'Show error message'
     
-  /v1/articles/categories/{text}?page={page}&limit={limit}:
+  /api/v1/articles/categories/{text}?page={page}&limit={limit}:
     get:
       description: 'Get some popular categories'
       tags:
@@ -243,7 +243,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/reddit?page={page}&limit={limit}:
+  /api/v1/reddit?page={page}&limit={limit}:
     get:
       description: 'Get all posts'
       tags:
@@ -267,7 +267,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/reddit/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
+  /api/v1/reddit/search?text={text}&sort={sortOrder}&page={page}&limit={limit}:
     get:
       description: 'Full-text search'
       tags:
@@ -303,7 +303,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/reddit/categories?page={page}&limit={limit}:
+  /api/v1/reddit/categories:
     get:
       description: 'Get some popular categories'
       tags:
@@ -314,7 +314,7 @@ paths:
       500:
         description: 'Show error message'
     
-  /v1/reddit/categories/{text}?page={page}&limit={limit}:
+  /api/v1/reddit/categories/{text}?page={page}&limit={limit}:
     get:
       description: 'Get some popular categories'
       tags:
@@ -344,7 +344,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/coins?limit={limit}:
+  /api/v1/coins?limit={limit}:
     get:
       description: 'Get {limit} coins'
       tags:
@@ -361,7 +361,7 @@ paths:
           description: 'Show the number of avaliable coins and and array of coins'
         500:
           description: 'Show error message'
-  /v1/coins/{symbol}:
+  /api/v1/coins/{symbol}:
     get:
       description: 'Get info of a specific coin by symbol'
       tags:
@@ -380,7 +380,7 @@ paths:
           description: 'Show error message'
         400:
           description: 'Coin symbol must not be null/undefined'
-  /v1/categories/articles:
+  /api/v1/categories/articles:
     get:
       description: 'Get 10 most categories for articles'
       tags:
@@ -391,7 +391,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/categories/articles/search?text={text}&opt={opt}:
+  /api/v1/categories/articles/search?text={text}&opt={opt}:
     get:
       description: 'Find a category for articles'
       tags:
@@ -413,7 +413,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/categories/posts:
+  /api/v1/categories/posts:
     get:
       description: 'Get 10 most popular categories for posts'
       tags:
@@ -424,7 +424,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/categories/posts/search?text={text}&opt={opt}:
+  /api/v1/categories/posts/search?text={text}&opt={opt}:
     get:
       description: 'Find a category for posts'
       tags:
@@ -446,7 +446,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/users/signup:
+  /api/v1/users/signup:
     post:
       description: 'Register a new user'
       tags:
@@ -472,7 +472,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/users/login:
+  /api/v1/users/login:
     post:
       description: 'Login existing user'
       tags:
@@ -490,7 +490,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /v1/users/credentials:
+  /api/v1/users/credentials:
     put:
       description: 'Update password for existing users'
       tags:
@@ -501,7 +501,7 @@ paths:
             schema:
               $ref: '#/components/schemas/User'
 
-  /v1/users/subscription:
+  /api/v1/users/subscription:
     put:
       description: 'Update exsting users subscription'
       tags:

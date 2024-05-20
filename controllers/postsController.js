@@ -76,9 +76,9 @@ const getPosts = async (req, res) => {
 /***********************************Full text search posts****************************************/
 const fulltextSearchPosts = async (req, res) => {
   // Get params
+  const text = req.params.text;
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 30;
-  const text = req.query.text;
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
   const searchCache = await redis.get(`posts_search_${text}_${page}_${limit}`);
@@ -97,7 +97,7 @@ const fulltextSearchPosts = async (req, res) => {
       $search: {
         index: process.env.MONGODB_POST_SEARCH_INDEX_NAME,
         text: {
-          query: req.query.text,
+          query: text,
           path: ["post_title", "post_content"],
           fuzzy: {}
         },

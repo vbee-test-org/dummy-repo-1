@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Article from "../models/articles/ArticleModel.js";
 import ArticleCategory from "../models/articles/ArticleCategoryModel.js";
 import { Redis } from "ioredis";
@@ -90,9 +89,9 @@ const getArticles = async (req, res) => {
 /***********************************Search a specific article****************************************/
 const fulltextSearchArticles = async (req, res) => {
   // Get params
+  const text = req.params.text;
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 30;
-  const text = req.query.text;
   // Redis instance
   const redis = new Redis(process.env.REDIS_URL);
   const searchCache = await redis.get(`articles_search_${text}_${page}_${limit}`);

@@ -37,11 +37,11 @@ const swaggerSpec = {
 
 // Routes
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(swaggerSpec)))
-app.use("/v1/articles", articlesRoutes)
-app.use("/v1/categories", categoriesRoutes)
-app.use("/v1/reddit", postsRoutes)
-app.use("/v1/users", usersRoutes)
-app.use("/v1/coins", coinsRoutes)
+app.use("/api/v1/articles", articlesRoutes)
+app.use("/api/v1/categories", categoriesRoutes)
+app.use("/api/v1/reddit", postsRoutes)
+app.use("/api/v1/users", usersRoutes)
+app.use("/api/v1/coins", coinsRoutes)
 
 mongoose.connect(connectionSTring, { dbName: process.env.MONGODB_DATABASE_NAME })
   .then(() => {
