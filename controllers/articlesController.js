@@ -168,7 +168,7 @@ const autocompleteArticleSearch = async (req, res) => {
     const pipeline = []
     pipeline.push({
       $search: {
-        index: process.env.MONGODB_SEARCH_INDEX_NAME,
+        index: process.env.MONGODB_ARTICLE_AUTOCOMPLETE_SEARCH_INEX_NAME,
         autocomplete: {
           query: req.query.text,
           path: "article_title",
