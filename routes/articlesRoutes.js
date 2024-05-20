@@ -10,7 +10,7 @@ router.get("/", getArticles);
 router.get("/:text", fulltextSearchArticles);
 
 // Autocomplete search
-router.get("/autocomplete", autocompleteArticleSearch);
+router.get("/autocomplete/:text", autocompleteArticleSearch);
 
 // Get all for articles categories
 router.get("/categories", getArticleCategories);

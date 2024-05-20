@@ -184,7 +184,7 @@ paths:
         500:
           description: 'Show error message'
 
-  /api/v1/articles/autocomplete?text={text}:
+  /api/v1/articles/autocomplete/{text}:
     get:
       description: 'Autocomplete search'
       tags:

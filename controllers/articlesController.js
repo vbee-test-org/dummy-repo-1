@@ -170,47 +170,25 @@ const autocompleteArticleSearch = async (req, res) => {
       $search: {
         index: process.env.MONGODB_ARTICLE_AUTOCOMPLETE_SEARCH_INEX_NAME,
         autocomplete: {
-          query: req.query.text,
+          query: req.params.text,
           path: "article_title",
           tokenOrder: "sequential",
         },
       },
     });
     pipeline.push({
-      $lookup: {
-        from: "articles.publishers",
-        localField: "website_source",
-        foreignField: "ref_name",
-        as: "publisher",
-      }
-    });
-    pipeline.push({
-      $unwind: "$publisher"
-    });
-    pipeline.push({
       $project: {
         _id: 0,
         article_title: 1,
-        article_link: 1,
-        author: 1,
-        website_source: 0,
-        publisher: {
-          name: "$publisher.name",
-          logo: "$publisher.logo"
-        },
-        article_summary: 1,
-        article_detailed_content: 1,
-        thumbnail_image: 1,
-        creation_date: 1,
-        categories: 1,
         score: { $meta: "searchScore" },
       }
     });
     pipeline.push({
       $limit: 10
     });
-    const result = await Article.aggregate(pipeline)
-    res.status(200).json({ result });
+    const articles = await Article.aggregate(pipeline)
+    const count = articles.length
+    res.status(200).json({ count, articles });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
