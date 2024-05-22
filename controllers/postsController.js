@@ -50,6 +50,7 @@ const getPosts = async (req, res) => {
     pipeline.push({
       $project: {
         _id: 0,
+        guid: 1,
         post_title: 1,
         post_link: 1,
         author: 1,
@@ -106,6 +107,7 @@ const fulltextSearchPosts = async (req, res) => {
     pipeline.push({
       $project: {
         _id: 0,
+        guid: 1,
         post_title: 1,
         post_link: 1,
         author: 1,
@@ -166,6 +168,7 @@ const getPostCategories = async (req, res) => {
       categories: categories.map(category => ({
         category: category.category,
         posts: category.posts.map(post => ({
+          guid: post.guid,
           post_link: post.post_link,
           website_source: post.website_source,
           post_title: post.post_title,
@@ -246,6 +249,7 @@ const searchPostCategories = async (req, res) => {
     const categories = results.map(category => ({
       category: category.category,
       posts: category.posts.map(post => ({
+        guid: post.guid,
         post_link: post.post_link,
         website_source: post.website_source,
         post_title: post.post_title,
