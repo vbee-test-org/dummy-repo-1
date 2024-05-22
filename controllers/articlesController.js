@@ -223,7 +223,7 @@ const getArticleCategories = async (req, res) => {
           }
         }
       });
-    const count = categories.length;
+    const count = categories.length || 0;
     const reduced_categories = {
       count,
       categories: categories.map(category => ({
@@ -290,7 +290,7 @@ const searchArticleCategories = async (req, res) => {
             }
           }
         });
-      count = results.length * 10;
+      count = results.length * 10 || 0;
     }
     else if (opt === "e") {
       searchTerm = { $eq: text };
@@ -311,7 +311,7 @@ const searchArticleCategories = async (req, res) => {
         { $match: { category: searchTerm } },
         { $project: { _id: 0, count: { $size: "$articles_guid" } } }
       ]);
-      count = articlesCount[0].count;
+      count = articlesCount[0].count || 0;
     }
     else {
       return res.status(400).json({ error: "Undefined search term" })
