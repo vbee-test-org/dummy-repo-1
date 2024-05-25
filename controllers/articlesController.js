@@ -76,7 +76,7 @@ const getArticles = async (req, res) => {
         categories: 1,
       }
     });
-    const articles = await Article.aggregate(pipeline, { readConcern: { level: "majority" } });
+    const articles = await Article.aggregate(pipeline);
     const count = await Article.estimatedDocumentCount();
     // Setting cache
     redis.set(`articles_content_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, articles }), "EX", 600);

@@ -63,7 +63,7 @@ const getPosts = async (req, res) => {
         media_url: 1
       }
     });
-    const posts = await Post.aggregate(pipeline, { readConcern: { level: "majority" } });
+    const posts = await Post.aggregate(pipeline);
     const count = await Post.estimatedDocumentCount();
     // Setting cache
     redis.set(`posts_content_${page}_${limit}`, JSON.stringify({ count, totalPages: Math.ceil(count / limit), currentPage: page, posts }), "EX", 600);
