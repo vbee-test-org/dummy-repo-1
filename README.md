@@ -28,13 +28,20 @@ To get started with the project, follow these steps:
     ```
 
 3. Set up the environment variables:
+>[!IMPORTANT]
+> Please create a MongoDB Atlas CLuster and database and a redis database to run the app
 
-    - Create a `.env` file in the root directory of the project.
-    - Add the following environment variables to the `.env` file:
+- Create a `.env` file in the root directory of the project.
+- Add the following environment variables to the `.env` file:
 
       ```plaintext
-      PORT=your-desired-port
-      MONGODB_URI=your-mongodb-uri
+      PORT = <your-port>
+      CONNECTION_STRING = <your-connection-string>
+      MONGODB_DATABASE_NAME = <your-mongodb-database-name>
+      MONGODB_ARTICLE_SEARCH_INDEX_NAME = <your-mongodb-article-search-index>
+      MONGODB_POST_SEARCH_INDEX_NAME = <your-mongodb-post-search-index>
+      MONGODB_ARTICLE_AUTOCOMPLETE_SEARCH_INDEX_NAME = <your-mongodb-article-autocomplete-search-index>
+      REDIS_URL = <your-redis-url>
       ```
 
 4. Start the development server:
@@ -42,8 +49,8 @@ To get started with the project, follow these steps:
     ```bash
     npm run start
     ```
-    >[!TIP] 
-    > You can change in `package.json` file key `"start": "node server.js"` to `"start": "nodemon server.js` to hot reload evertime you save changes to a file.
+>[!TIP] 
+> You can change in `package.json` file key `"start": "node server.js"` to `"start": "nodemon server.js` to hot reload evertime you save changes to a file.
 
 5. Open your browser and navigate to `http://localhost:<PORT>` (or failsafe to `http://localhost:4000`) to check if the server is running.
 6. To send requests and test APIs, I recommend using [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/)
