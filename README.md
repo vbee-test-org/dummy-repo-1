@@ -48,10 +48,11 @@ To get started with the project, follow these steps:
 5. Open your browser and navigate to `http://localhost:<PORT>` (or failsafe to `http://localhost:4000`) to check if the server is running.
 6. To send requests and test APIs, I recommend using [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/)
 <br> This table links to the documentation of how to use APIs </br>
+<br> Once you run step 4, you can click the link below (localhost port 4000)
 
 | Objects | Links |
 |---------|-------|
-| Main page| [click here!](https://newsaggregator-mern.onrender.com/api-docs)  |
+| Main page| [click here!](http://localhost:4000/api-docs/#/)  |
 
 ## Contributing
 
