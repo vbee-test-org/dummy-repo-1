@@ -29,7 +29,7 @@ const swaggerSpec = {
       version: "1.0.0",
     },
     servers: [{
-      url: `http://localhost:4000/`
+      url: `https://newsaggregator-mern.onrender.com`
     }]
   },
   apis: ["./docs/swagger-docs.yaml"]
