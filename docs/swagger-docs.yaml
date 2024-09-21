@@ -123,6 +123,27 @@ components:
       
 
 paths:
+  /api/v1/askai:
+    post:
+      description: 'Ask AI'
+      tags:
+      - 'AI'
+      requestBody:
+        description: 'Adding user credentials'
+        required: true
+        content:
+          application/json:
+            schema:
+              prompt:
+                type: 'string'
+            example:
+              prompt: 'Tell me a joke'
+      responses:
+        200:
+          description: 'Show the response to the given prompt'
+        400:
+          description: 'Prompt must not be empty!'
+
   /api/v1/articles?page={page}&limit={limit}:
     get:
       description: 'Get all articles'

@@ -20,6 +20,7 @@
     "ioredis": "^5.4.1",
     "mongodb": "^6.5.0",
     "mongoose": "^8.2.4",
+    "nodemon": "^3.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },

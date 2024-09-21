@@ -9,6 +9,7 @@ import swaggerUI from "swagger-ui-express"
 import mongoose from "mongoose"
 import cors from "cors";
 import dotenv from "dotenv";
+import { aiRoutes } from "./routes/aiRoutes.js"
 
 const app = express()
 
@@ -42,6 +43,7 @@ app.use("/api/v1/categories", categoriesRoutes)
 app.use("/api/v1/reddit", postsRoutes)
 app.use("/api/v1/users", usersRoutes)
 app.use("/api/v1/coins", coinsRoutes)
+app.use("/api/v1/askai", aiRoutes)
 
 mongoose.connect(connectionSTring, { dbName: process.env.MONGODB_DATABASE_NAME })
   .then(() => {
