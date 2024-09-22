@@ -42,6 +42,11 @@ const swaggerSpec = {
 
 
 // Routes
+e.get("/", (req, res) => {
+  res.status(200).json({
+    "msg": "Server is healthy!!!"
+  })
+})
 e.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(swaggerSpec)))
 e.use("/api/v1/articles", articlesRoutes)
 e.use("/api/v1/categories", categoriesRoutes)
