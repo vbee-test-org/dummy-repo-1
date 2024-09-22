@@ -11,15 +11,15 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { aiRoutes } from "./routes/aiRoutes.js"
 
-const app = express()
+const e = express()
 
 // Middlewares
-app.use(express.json())
-app.use(cors())
+e.use(express.json())
+e.use(cors())
 dotenv.config()
 
 // Configs
-const port = process.env.PORT || 4000;
+const port = process.env.SERVER_PORT || 4000;
 const connectionSTring = process.env.CONNECTION_STRING;
 const swaggerSpec = {
   definition: {
@@ -42,18 +42,18 @@ const swaggerSpec = {
 
 
 // Routes
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(swaggerSpec)))
-app.use("/api/v1/articles", articlesRoutes)
-app.use("/api/v1/categories", categoriesRoutes)
-app.use("/api/v1/reddit", postsRoutes)
-app.use("/api/v1/users", usersRoutes)
-app.use("/api/v1/coins", coinsRoutes)
-app.use("/api/v1/askai", aiRoutes)
+e.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJSDoc(swaggerSpec)))
+e.use("/api/v1/articles", articlesRoutes)
+e.use("/api/v1/categories", categoriesRoutes)
+e.use("/api/v1/reddit", postsRoutes)
+e.use("/api/v1/users", usersRoutes)
+e.use("/api/v1/coins", coinsRoutes)
+e.use("/api/v1/askai", aiRoutes)
 
 mongoose.connect(connectionSTring, { dbName: process.env.MONGODB_DATABASE_NAME })
   .then(() => {
     console.log("Connected successfully to MongoDB");
-    app.listen(port, () => { console.log(`Listening on port ${port}`) });
+    e.listen(port, () => { console.log(`Listening on port ${port}`) });
   })
   .catch(err => console.log(err));
 
