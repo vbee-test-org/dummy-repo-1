@@ -19,7 +19,7 @@ e.use(cors())
 dotenv.config()
 
 // Configs
-const port = process.env.SERVER_PORT || 4000;
+const port = process.env.PORT || 4000;
 const connectionSTring = process.env.CONNECTION_STRING;
 const swaggerSpec = {
   definition: {
