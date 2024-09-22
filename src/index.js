@@ -34,6 +34,9 @@ const swaggerSpec = {
       },
       {
         url: `http://localhost:4000`
+      },
+      {
+        url: `https://bitdigest.up.railway.app`
       }
     ]
   },
