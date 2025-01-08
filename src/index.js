@@ -11,7 +11,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { aiRoutes } from "./routes/aiRoutes.js";
 
-// Test comment to check webhook
+// Test comment to check webhook =)) accidentally push instead of pull request
 const e = express();
 
 // Middlewares
